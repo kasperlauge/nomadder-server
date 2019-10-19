@@ -3,20 +3,19 @@ import { FilePersistanceStrategy } from './models/file-persistance-strategy.mode
 import { EventTypes, INomadderEvent, NOMADDER_PROTOCOL } from './models/nomadder-event.model';
 import { IServerData } from './models/server-data.model';
 import { ISyncEventPayload } from './models/sync-event-payload.model';
-import { 
-  extractNew, 
-  verifyIntegrity, 
-} from './util/data-comparer.model';
+import { extractNew, verifyIntegrity } from './util/data-comparer.model';
 
 export function setup(config: IConfig) {
   if (!config) {
     throw new Error("No config defined, there should be a config object specified for method 'setup(IConfig)'");
   }
   if (!config.websocket) {
-    throw new Error("No websocket server defined, there should be a websocket server object specified for config object 'setup(IConfig)'");
+    throw new Error(
+      "No websocket server defined, there should be a websocket server object specified for config object 'setup(IConfig)'",
+    );
   }
   if (!config.fileLocation) {
-    config.fileLocation = ".";
+    config.fileLocation = '.';
   }
   if (!config.redundancyLimit) {
     config.redundancyLimit = 3;
@@ -52,10 +51,9 @@ export function setup(config: IConfig) {
             });
 
             const newData = processedData
-            .filter(d => d.redundancyIndex < config.redundancyLimit)
-            .map(d => ({data: d.data, serverId: d.serverId, timestamp: d.timestamp} as IServerData));
+              .filter(d => d.redundancyIndex < config.redundancyLimit)
+              .map(d => ({ data: d.data, serverId: d.serverId, timestamp: d.timestamp } as IServerData));
             config.persistenceStrategy.persistNewData(newData);
-
           }
           break;
         default:
@@ -68,4 +66,3 @@ export function setup(config: IConfig) {
 
   return true;
 }
-

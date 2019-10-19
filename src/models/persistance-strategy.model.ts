@@ -1,5 +1,5 @@
-import { IServerData } from "./server-data.model";
+import { IServerData } from './server-data.model';
 
 export interface IPersistanceStrategy {
-  persistNewData: (serverDataIndications: IServerData[]) => Promise<void>
+  persistNewData: (serverDataIndications: IServerData[]) => Promise<void>;
 }

@@ -15,5 +15,3 @@ export interface INomadderEvent {
   event: EventTypes;
   payload: ISyncEventPayload | IRefreshEventPayload;
 }
-
-
