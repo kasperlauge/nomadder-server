@@ -1,5 +1,5 @@
-import { IData } from './data.model';
-import { IServerData } from './server-data.model';
+import { IRefreshEventPayload } from './refresh-event-payload.model';
+import { ISyncEventPayload } from './sync-event-payload.model';
 
 export enum EventTypes {
   SYNC = 'SYNC',
@@ -16,10 +16,4 @@ export interface INomadderEvent {
   payload: ISyncEventPayload | IRefreshEventPayload;
 }
 
-export interface ISyncEventPayload {
-  data: IData;
-}
 
-export interface IRefreshEventPayload {
-  serverData: IServerData;
-}

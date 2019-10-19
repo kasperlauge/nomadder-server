@@ -1,5 +1,5 @@
 export interface IServerData {
+  serverId: any;
   data: any;
-  hash: string;
   timestamp: string;
 }

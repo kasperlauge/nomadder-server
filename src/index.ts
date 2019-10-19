@@ -1,7 +1,29 @@
-import { Server } from 'ws';
+import { IConfig } from './models/config.model';
+import { FilePersistanceStrategy } from './models/file-persistance-strategy.model';
 import { EventTypes, INomadderEvent, NOMADDER_PROTOCOL } from './models/nomadder-event.model';
+import { IServerData } from './models/server-data.model';
+import { ISyncEventPayload } from './models/sync-event-payload.model';
+import { 
+  extractNew, 
+  verifyIntegrity, 
+} from './util/data-comparer.model';
 
 export function setup(config: IConfig) {
+  if (!config) {
+    throw new Error("No config defined, there should be a config object specified for method 'setup(IConfig)'");
+  }
+  if (!config.websocket) {
+    throw new Error("No websocket server defined, there should be a websocket server object specified for config object 'setup(IConfig)'");
+  }
+  if (!config.fileLocation) {
+    config.fileLocation = ".";
+  }
+  if (!config.redundancyLimit) {
+    config.redundancyLimit = 3;
+  }
+  if (!config.persistenceStrategy) {
+    config.persistenceStrategy = new FilePersistanceStrategy();
+  }
   const wss = config.websocket;
   wss.addListener('connection', ws => {
     ws.addListener('message', message => {
@@ -20,8 +42,21 @@ export function setup(config: IConfig) {
 
       switch (msg.event) {
         case EventTypes.SYNC:
-          /*tslint:disable-next-line:no-console*/
-          console.debug('[SYNC event sent with payload]: ', msg.payload);
+          const payload = msg.payload as ISyncEventPayload;
+          if (verifyIntegrity(payload)) {
+            const processedData = extractNew(payload.data, config.fileLocation);
+            processedData.forEach(data => {
+              if (data.redundancyIndex >= config.redundancyLimit) {
+                // Do something to indicate that a client can delete this data
+              }
+            });
+
+            const newData = processedData
+            .filter(d => d.redundancyIndex < config.redundancyLimit)
+            .map(d => ({data: d.data, serverId: d.serverId, timestamp: d.timestamp} as IServerData));
+            config.persistenceStrategy.persistNewData(newData);
+
+          }
           break;
         default:
           /*tslint:disable-next-line:no-console*/
@@ -34,6 +69,3 @@ export function setup(config: IConfig) {
   return true;
 }
 
-export interface IConfig {
-  websocket: Server;
-}
