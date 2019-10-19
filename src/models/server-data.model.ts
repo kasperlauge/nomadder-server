@@ -1,4 +1,4 @@
-export interface ServerData {
+export interface IServerData {
   data: any;
   hash: string;
   timestamp: string;

@@ -1,6 +1,6 @@
-import { ServerData } from './server-data.model';
+import { IServerData } from './server-data.model';
 
-export interface Data {
-  serverData: ServerData[];
+export interface IData {
+  serverData: IServerData[];
   timestamp: string;
 }
