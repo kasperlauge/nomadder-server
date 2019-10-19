@@ -1,4 +1,4 @@
 import { setup } from '../index';
 test('Setup', () => {
-  expect(setup({endpoint: "test"})).toBe(true);
+  expect(setup({ endpoint: 'test' })).toBe(true);
 });

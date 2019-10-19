@@ -9,17 +9,21 @@
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
     "test": "jest --config jestconfig.json",
-    "prepare" : "npm run build",
-    "prepublishOnly" : "npm test && npm run lint",
-    "preversion" : "npm run lint",
-    "version" : "npm run format && git add -A src",
-    "postversion" : "git push && git push --tags"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kasperlauge/nomadder-server.git"
   },
-  "keywords": ["Nomadic", "Computing", "Networking"],
+  "keywords": [
+    "Nomadic",
+    "Computing",
+    "Networking"
+  ],
   "author": "Kasper Lauge Madsen",
   "license": "ISC",
   "bugs": {
@@ -28,6 +32,7 @@
   "homepage": "https://github.com/kasperlauge/nomadder-server#readme",
   "devDependencies": {
     "@types/jest": "^24.0.19",
+    "@types/ws": "^6.0.3",
     "jest": "^24.9.0",
     "prettier": "^1.18.2",
     "ts-jest": "^24.1.0",
@@ -37,5 +42,8 @@
   },
   "files": [
     "lib/**/*"
-  ]
+  ],
+  "peerDependencies": {
+    "ws": "^7.1.2"
+  }
 }
