@@ -28,6 +28,8 @@ export function extractNew(data: IData, fileLocation: string): IServerDataIndica
       if (new Date(similar.timestamp) >= new Date(serverData.timestamp)) {
         similar.redundancyIndex++;
         redundancyIndex = similar.redundancyIndex;
+      } else {
+        similar.redundancyIndex = 0;
       }
       similar.timestamp = serverData.timestamp;
     } else {
