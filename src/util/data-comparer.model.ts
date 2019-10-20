@@ -31,6 +31,8 @@ export function extractNew(data: IData, fileLocation: string): IServerDataIndica
       }
       serverDataInfos.splice(similarIndex,1);
     }
+    /*tslint:disable-next-line:no-console*/
+    console.log("serverDataInfos", JSON.stringify({ ...serverData, redundancyIndex }));
     newServerData.push({ ...serverData, redundancyIndex });
   });
   const newInfo = newServerData
