@@ -1,27 +1,32 @@
 {
-  "configurations": [
-    {
-      "browse": {
-        "databaseFilename": "",
-        "limitSymbolsToIncludedHeaders": true
-      },
-      "includePath": [
-        "/home/kasperlauge/catkin_workspace/devel/include/**",
-        "/home/kasperlauge/catkin_ws/devel/include/**",
-        "/opt/ros/melodic/include/**",
-        "/home/kasperlauge/catkin_workspace/src/coordinate_transformation/include/**",
-        "/home/kasperlauge/catkin_workspace/src/drone_controller/include/**",
-        "/home/kasperlauge/catkin_ws/src/image_data/include/**",
-        "/home/kasperlauge/catkin_workspace/src/mavros/libmavconn/include/**",
-        "/home/kasperlauge/catkin_workspace/src/mavros/mavros/include/**",
-        "/home/kasperlauge/catkin_workspace/src/mavros/mavros_msgs/include/**",
-        "/home/kasperlauge/catkin_workspace/src/recon_protocol/include/**",
-        "/home/kasperlauge/catkin_workspace/src/slz_recognition/include/**",
-        "/home/kasperlauge/catkin_workspace/src/mavros/test_mavros/include/**",
-        "/home/kasperlauge/catkin_ws/src/test_ros/include/**",
-        "/usr/include/**"
-      ],
-      "name": "ROS"
-    }
-  ]
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/home/kasperlauge/catkin_workspace/devel/include/**",
+                "/home/kasperlauge/catkin_ws/devel/include/**",
+                "/opt/ros/melodic/include/**",
+                "/home/kasperlauge/catkin_workspace/src/coordinate_transformation/include/**",
+                "/home/kasperlauge/catkin_workspace/src/drone_controller/include/**",
+                "/home/kasperlauge/catkin_ws/src/image_data/include/**",
+                "/home/kasperlauge/catkin_workspace/src/mavros/libmavconn/include/**",
+                "/home/kasperlauge/catkin_workspace/src/mavros/mavros/include/**",
+                "/home/kasperlauge/catkin_workspace/src/mavros/mavros_msgs/include/**",
+                "/home/kasperlauge/catkin_workspace/src/recon_protocol/include/**",
+                "/home/kasperlauge/catkin_workspace/src/slz_recognition/include/**",
+                "/home/kasperlauge/catkin_workspace/src/mavros/test_mavros/include/**",
+                "/home/kasperlauge/catkin_ws/src/test_ros/include/**",
+                "/usr/include/**"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
 }
