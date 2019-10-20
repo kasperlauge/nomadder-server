@@ -13,7 +13,13 @@ export function extractNew(data: IData, fileLocation: string): IServerDataIndica
     const fileData = fs.readFileSync(filePath, 'utf-8');
     serverDataInfos = JSON.parse(fileData) as IServerDataInfo[];
   }
+  /*tslint:disable-next-line:no-console*/
+  console.log("data", JSON.stringify(data));
   data.serverData.forEach(serverData => {
+    /*tslint:disable-next-line:no-console*/
+    console.log("serverData", JSON.stringify(serverData));
+    /*tslint:disable-next-line:no-console*/
+    console.log("serverDataInfos", JSON.stringify(serverDataInfos));
     let redundancyIndex = 0;
     const similar = serverDataInfos.find(s => s.serverId === serverData.serverId);
     // If we already have the data, and the timestamp is newer or the same then it isn't new data
