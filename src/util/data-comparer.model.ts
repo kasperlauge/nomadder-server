@@ -14,36 +14,34 @@ export function extractNew(data: IData, fileLocation: string): IServerDataIndica
     serverDataInfos = JSON.parse(fileData) as IServerDataInfo[];
   }
   /*tslint:disable-next-line:no-console*/
-  console.log("data", JSON.stringify(data));
+  console.log('data', JSON.stringify(data));
   data.serverData.forEach(serverData => {
     /*tslint:disable-next-line:no-console*/
-    console.log("serverData", JSON.stringify(serverData));
+    console.log('serverData', JSON.stringify(serverData));
     /*tslint:disable-next-line:no-console*/
-    console.log("serverDataInfos", JSON.stringify(serverDataInfos));
+    console.log('serverDataInfos', JSON.stringify(serverDataInfos));
     let redundancyIndex = 0;
     const similarIndex = serverDataInfos.findIndex(s => s.serverId === serverData.serverId);
     const similar = serverDataInfos[similarIndex];
     // If we already have the data, and the timestamp is newer or the same then it isn't new data
-    if (similar) {
-      if (new Date(similar.timestamp) >= new Date(serverData.timestamp)) {
-        similar.redundancyIndex++;
-        redundancyIndex = similar.redundancyIndex;
-      }
-      serverDataInfos.splice(similarIndex,1);
+    if (similar && new Date(similar.timestamp) >= new Date(serverData.timestamp)) {
+      similar.redundancyIndex++;
+      redundancyIndex = similar.redundancyIndex;
     }
     /*tslint:disable-next-line:no-console*/
-    console.log("serverDataInfos", JSON.stringify({ ...serverData, redundancyIndex }));
+    console.log('serverDataInfos', JSON.stringify({ ...serverData, redundancyIndex }));
     newServerData.push({ ...serverData, redundancyIndex });
+    if (similar) {
+      serverDataInfos.splice(similarIndex, 1);
+    }
   });
   const newInfo = newServerData
-  .filter(n => n.redundancyIndex === 0)
-  .map(n => (
-    {
+    .filter(n => n.redundancyIndex === 0)
+    .map(n => ({
       redundancyIndex: n.redundancyIndex,
       serverId: n.serverId,
-      timestamp: n.timestamp
-    }
-    )) as IServerDataInfo[];
+      timestamp: n.timestamp,
+    })) as IServerDataInfo[];
   fs.writeFileSync(filePath, JSON.stringify([...serverDataInfos, ...newInfo]), 'utf-8');
   return newServerData;
 }
