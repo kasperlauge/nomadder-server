@@ -29,7 +29,16 @@ export function extractNew(data: IData, fileLocation: string): IServerDataIndica
     }
     newServerData.push({ ...serverData, redundancyIndex });
   });
-  fs.writeFileSync(filePath, JSON.stringify(serverDataInfos), 'utf-8');
+  const newInfo = newServerData
+  .filter(n => n.redundancyIndex === 0)
+  .map(n => (
+    {
+      redundancyIndex: n.redundancyIndex,
+      serverId: n.serverId,
+      timestamp: n.timestamp
+    }
+    )) as IServerDataInfo[];
+  fs.writeFileSync(filePath, JSON.stringify([...serverDataInfos, ...newInfo]), 'utf-8');
   return newServerData;
 }
 

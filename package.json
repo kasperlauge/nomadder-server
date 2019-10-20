@@ -1,6 +1,6 @@
 {
   "name": "nomadder-server",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A web based nomadic data sharing framework between non-internet connected servers",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
