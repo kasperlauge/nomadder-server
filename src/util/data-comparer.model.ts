@@ -21,11 +21,15 @@ export function extractNew(data: IData, fileLocation: string): IServerDataIndica
     /*tslint:disable-next-line:no-console*/
     console.log("serverDataInfos", JSON.stringify(serverDataInfos));
     let redundancyIndex = 0;
-    const similar = serverDataInfos.find(s => s.serverId === serverData.serverId);
+    const similarIndex = serverDataInfos.findIndex(s => s.serverId === serverData.serverId);
+    const similar = serverDataInfos[similarIndex];
     // If we already have the data, and the timestamp is newer or the same then it isn't new data
-    if (similar && new Date(similar.timestamp) >= new Date(serverData.timestamp)) {
-      similar.redundancyIndex++;
-      redundancyIndex = similar.redundancyIndex;
+    if (similar) {
+      if (new Date(similar.timestamp) >= new Date(serverData.timestamp)) {
+        similar.redundancyIndex++;
+        redundancyIndex = similar.redundancyIndex;
+      }
+      serverDataInfos.splice(similarIndex,1);
     }
     newServerData.push({ ...serverData, redundancyIndex });
   });
