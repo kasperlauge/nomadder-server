@@ -13,13 +13,7 @@ export function extractNew(data: IData, fileLocation: string): IServerDataIndica
     const fileData = fs.readFileSync(filePath, 'utf-8');
     serverDataInfos = JSON.parse(fileData) as IServerDataInfo[];
   }
-  /*tslint:disable-next-line:no-console*/
-  console.log("data", JSON.stringify(data));
   data.serverData.forEach(serverData => {
-    /*tslint:disable-next-line:no-console*/
-    console.log("serverData", JSON.stringify(serverData));
-    /*tslint:disable-next-line:no-console*/
-    console.log("serverDataInfos", JSON.stringify(serverDataInfos));
     let redundancyIndex = 0;
     const similarIndex = serverDataInfos.findIndex(s => s.serverId === serverData.serverId);
     const similar = serverDataInfos[similarIndex];
