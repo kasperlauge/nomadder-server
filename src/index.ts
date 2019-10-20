@@ -1,11 +1,12 @@
-import { IConfig } from './models/config.model';
+import { IConfig, IConfigParameters } from './models/config.model';
 import { FilePersistanceStrategy } from './models/file-persistance-strategy.model';
 import { EventTypes, INomadderEvent, NOMADDER_PROTOCOL } from './models/nomadder-event.model';
 import { IServerData } from './models/server-data.model';
 import { ISyncEventPayload } from './models/sync-event-payload.model';
 import { extractNew, verifyIntegrity } from './util/data-comparer.model';
 
-export function setup(config: IConfig) {
+export function setup(configuration: IConfig) {
+  const config = { ...configuration } as IConfigParameters;
   if (!config) {
     throw new Error("No config defined, there should be a config object specified for method 'setup(IConfig)'");
   }

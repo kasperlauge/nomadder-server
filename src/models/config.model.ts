@@ -6,3 +6,10 @@ export interface IConfig {
   persistenceStrategy?: IPersistanceStrategy;
   redundancyLimit?: number;
 }
+
+export interface IConfigParameters {
+  websocket: Server;
+  fileLocation: string;
+  persistenceStrategy: IPersistanceStrategy;
+  redundancyLimit: number;
+}
