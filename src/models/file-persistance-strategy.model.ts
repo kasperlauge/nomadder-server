@@ -12,6 +12,10 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
   }
 
   public persistNewData(newData: IServerData[], schemaDefinition: ICollectionDefinition[]) {
+    // tslint:disable-next-line: no-console
+    console.log("NewData: ", JSON.stringify(newData));
+    // tslint:disable-next-line: no-console
+    console.log("SchemaDefintions: ", JSON.stringify(schemaDefinition));
     const colsToAdd = this.findCollectionsToAdd(schemaDefinition);
     colsToAdd.forEach(c => this.addCollection(c));
     const groupedData = this.groupData(newData);
@@ -21,7 +25,12 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
   }
 
   private findCollectionsToAdd(schemaDefinition: ICollectionDefinition[]): ICollectionDefinition[] {
-    return schemaDefinition.filter(c => !fs.existsSync(`${this.fileLocation}/${c.name}.json`));
+    if (fs.existsSync(this.fileLocation)) {
+      return schemaDefinition.filter(c => !fs.existsSync(`${this.fileLocation}/${c.name}.json`));
+    } else {
+      fs.mkdirSync(this.fileLocation);
+      return schemaDefinition;
+    }
   }
 
   private groupData(newData: IServerData[]): IGroupedServerData[] {

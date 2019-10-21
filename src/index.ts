@@ -43,8 +43,11 @@ export function setup(configuration: IConfig) {
       switch (msg.event) {
         case EventTypes.SYNC:
           const payload = msg.payload as ISyncEventPayload;
+          // tslint:disable-next-line: no-console
+          console.log("Payload: ", JSON.stringify(payload));
           if (verifyIntegrity(payload)) {
             const processedData = extractNew(payload.data, config.fileLocation);
+            
             processedData.forEach(data => {
               if (data.redundancyIndex >= config.redundancyLimit) {
                 // Do something to indicate that a client can delete this data
@@ -54,7 +57,9 @@ export function setup(configuration: IConfig) {
             const newData = processedData
               .filter(d => d.redundancyIndex < config.redundancyLimit)
               .map(d => ({ data: d.data, serverId: d.serverId, timestamp: d.timestamp } as IServerData));
-            config.persistenceStrategy.persistNewData(newData, payload.schemaDefintion);
+              // tslint:disable-next-line: no-console
+              console.log("New Data: ", JSON.stringify(processedData));
+            config.persistenceStrategy.persistNewData(newData, payload.schemaDefinition);
           }
           break;
         default:
