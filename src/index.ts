@@ -22,7 +22,7 @@ export function setup(configuration: IConfig) {
     config.redundancyLimit = 3;
   }
   if (!config.persistenceStrategy) {
-    config.persistenceStrategy = new FilePersistanceStrategy();
+    config.persistenceStrategy = new FilePersistanceStrategy({});
   }
   const wss = config.websocket;
   wss.addListener('connection', ws => {
@@ -54,7 +54,7 @@ export function setup(configuration: IConfig) {
             const newData = processedData
               .filter(d => d.redundancyIndex < config.redundancyLimit)
               .map(d => ({ data: d.data, serverId: d.serverId, timestamp: d.timestamp } as IServerData));
-            config.persistenceStrategy.persistNewData(newData);
+            config.persistenceStrategy.persistNewData(newData, payload.schemaDefintion);
           }
           break;
         default:

@@ -1,5 +1,7 @@
+import { IServerDataPayload } from './server-data-payload.model';
+
 export interface IServerData {
   serverId: any;
-  data: any;
+  data: IServerDataPayload[];
   timestamp: string;
 }

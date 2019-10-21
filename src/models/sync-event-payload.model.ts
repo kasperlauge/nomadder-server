@@ -1,7 +1,7 @@
+import { ICollectionDefinition } from './collection-definition.model';
 import { IData } from './data.model';
-import { ISchemaDefinition } from './schema-definition.model';
 export interface ISyncEventPayload {
-  schemaDefintion: ISchemaDefinition;
+  schemaDefintion: ICollectionDefinition[];
   data: IData;
   hash: string;
 }
