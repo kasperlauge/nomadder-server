@@ -1,7 +1,10 @@
 import * as fs from 'fs';
 import { ICollectionDefinition } from './collection-definition.model';
 import { IFilePersistanceStrategyConfig } from './file-persistance-strategy-config.model';
+import { IGroupedServerData } from './grouped-server-data.model';
+import { ILocalData } from './local-data.model';
 import { IPersistanceStrategy } from './persistance-strategy.model';
+import { IServerDataItem } from './server-data-item.model';
 import { IServerData } from './server-data.model';
 
 export class FilePersistanceStrategy implements IPersistanceStrategy {
@@ -11,11 +14,19 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
     this.fileLocation = fileLocation;
   }
 
+  public persistData(db: ILocalData, fileLocation: string) {
+    const serverDataFile = `${fileLocation}/server-data.json`;
+    fs.writeFile(serverDataFile, JSON.stringify(db.serverDataInfo), () => {
+      // tslint:disable-next-line: no-console
+      console.log("Cached data");
+    });
+  }
+
   public persistNewData(newData: IServerData[], schemaDefinition: ICollectionDefinition[]) {
     // tslint:disable-next-line: no-console
-    console.log("NewData: ", JSON.stringify(newData));
+    console.log('NewData: ', JSON.stringify(newData));
     // tslint:disable-next-line: no-console
-    console.log("SchemaDefintions: ", JSON.stringify(schemaDefinition));
+    console.log('SchemaDefintions: ', JSON.stringify(schemaDefinition));
     const colsToAdd = this.findCollectionsToAdd(schemaDefinition);
     colsToAdd.forEach(c => this.addCollection(c));
     const groupedData = this.groupData(newData);
@@ -72,14 +83,4 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
       collectionData.push(serverDataItem);
     }
   }
-}
-
-export interface IGroupedServerData {
-  collectionName: string;
-  data: IServerDataItem[];
-}
-
-export interface IServerDataItem {
-  id: any;
-  data: any;
 }

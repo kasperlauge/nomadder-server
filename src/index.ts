@@ -1,9 +1,12 @@
+import { BehaviorSubject, timer } from 'rxjs';
 import { IConfig, IConfigParameters } from './models/config.model';
 import { FilePersistanceStrategy } from './models/file-persistance-strategy.model';
+import { ILocalData } from './models/local-data.model';
 import { EventTypes, INomadderEvent, NOMADDER_PROTOCOL } from './models/nomadder-event.model';
 import { IServerData } from './models/server-data.model';
 import { ISyncEventPayload } from './models/sync-event-payload.model';
-import { extractNew, verifyIntegrity } from './util/data-comparer.model';
+import { extractNew, verifyIntegrity, hydrateData } from './util/data-comparer.model';
+import { take, map, switchMap } from 'rxjs/operators';
 
 export function setup(configuration: IConfig) {
   const config = { ...configuration } as IConfigParameters;
@@ -24,6 +27,10 @@ export function setup(configuration: IConfig) {
   if (!config.persistenceStrategy) {
     config.persistenceStrategy = new FilePersistanceStrategy({});
   }
+
+  const db = new BehaviorSubject<ILocalData>({ serverDataInfo: [], groupedServerData: [] });
+  hydrateData(db);
+
   const wss = config.websocket;
   wss.addListener('connection', ws => {
     ws.addListener('message', message => {
@@ -44,22 +51,22 @@ export function setup(configuration: IConfig) {
         case EventTypes.SYNC:
           const payload = msg.payload as ISyncEventPayload;
           // tslint:disable-next-line: no-console
-          console.log("Payload: ", JSON.stringify(payload));
+          console.log('Payload: ', JSON.stringify(payload));
           if (verifyIntegrity(payload)) {
-            const processedData = extractNew(payload.data, config.fileLocation);
-            
-            processedData.forEach(data => {
-              if (data.redundancyIndex >= config.redundancyLimit) {
-                // Do something to indicate that a client can delete this data
-              }
-            });
-
-            const newData = processedData
-              .filter(d => d.redundancyIndex < config.redundancyLimit)
-              .map(d => ({ data: d.data, serverId: d.serverId, timestamp: d.timestamp } as IServerData));
+            extractNew(payload.data, db).pipe(take(1)).subscribe(processedData => {
+              processedData.forEach(data => {
+                if (data.redundancyIndex >= config.redundancyLimit) {
+                  // Do something to indicate that a client can delete this data
+                }
+              });
+  
+              const newData = processedData
+                .filter(d => d.redundancyIndex < config.redundancyLimit)
+                .map(d => ({ data: d.data, serverId: d.serverId, timestamp: d.timestamp } as IServerData));
               // tslint:disable-next-line: no-console
-              console.log("New Data: ", JSON.stringify(processedData));
-            config.persistenceStrategy.persistNewData(newData, payload.schemaDefinition);
+              console.log('New Data: ', JSON.stringify(processedData));
+              // config.persistenceStrategy.persistNewData(newData, payload.schemaDefinition);
+            });
           }
           break;
         default:
@@ -67,6 +74,11 @@ export function setup(configuration: IConfig) {
           console.error('[Unknown event type]: ', msg.event);
           break;
       }
+
+      // Continuesly cache data
+      timer(5000, 5000).pipe(switchMap(_ => db.asObservable())).subscribe(localData => {
+        config.persistenceStrategy.persistData(localData, config.fileLocation);
+      });
     });
   });
 
