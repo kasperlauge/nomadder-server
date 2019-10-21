@@ -18,7 +18,7 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
     const serverDataFile = `${fileLocation}/server-data.json`;
     fs.writeFile(serverDataFile, JSON.stringify(db.serverDataInfo), () => {
       // tslint:disable-next-line: no-console
-      console.log("Cached data");
+      console.log('Cached data');
     });
   }
 
