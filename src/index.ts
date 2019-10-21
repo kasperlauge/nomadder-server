@@ -80,8 +80,7 @@ export function setup(configuration: IConfig) {
       // Continuesly cache data
     });
   });
-  timer(5000, 5000)
-    .pipe(switchMap(_ => db.asObservable()))
+  db.asObservable()
     .subscribe(localData => {
       config.persistenceStrategy.persistData(localData, config.fileLocation);
     });
