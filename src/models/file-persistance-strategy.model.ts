@@ -21,7 +21,7 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
   }
 
   private findCollectionsToAdd(schemaDefinition: ICollectionDefinition[]): ICollectionDefinition[] {
-    return schemaDefinition.filter(c => fs.existsSync(`${this.fileLocation}/${c.name}.json`));
+    return schemaDefinition.filter(c => !fs.existsSync(`${this.fileLocation}/${c.name}.json`));
   }
 
   private groupData(newData: IServerData[]): IGroupedServerData[] {
