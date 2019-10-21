@@ -23,80 +23,18 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
     const collectionLocation = `${fileLocation}/collections`;
     if (fs.existsSync(collectionLocation)) {
       db.groupedServerData.forEach(gds => {
-        fs.writeFile(`${collectionLocation}/${gds.collectionName}.json`, gds.data, () => {
+        fs.writeFile(`${collectionLocation}/${gds.collectionName}.json`, JSON.stringify(gds.data), () => {
           // Do nothing
         });
       });
     } else {
       fs.mkdir(collectionLocation, () => {
         db.groupedServerData.forEach(gds => {
-          fs.writeFile(`${collectionLocation}/${gds.collectionName}.json`, gds.data, () => {
+          fs.writeFile(`${collectionLocation}/${gds.collectionName}.json`, JSON.stringify(gds.data), () => {
             // Do nothing
           });
         });
       });
     }
   }
-
-  // public persistNewData(newData: IServerData[], schemaDefinition: ICollectionDefinition[]) {
-  //   // tslint:disable-next-line: no-console
-  //   console.log('NewData: ', JSON.stringify(newData));
-  //   // tslint:disable-next-line: no-console
-  //   console.log('SchemaDefintions: ', JSON.stringify(schemaDefinition));
-  //   const colsToAdd = this.findCollectionsToAdd(schemaDefinition);
-  //   colsToAdd.forEach(c => this.addCollection(c));
-  //   const groupedData = this.groupData(newData);
-  //   this.upsertGroupedData(groupedData);
-
-  //   return Promise.resolve();
-  // }
-
-  // private findCollectionsToAdd(schemaDefinition: ICollectionDefinition[]): ICollectionDefinition[] {
-  //   if (fs.existsSync(this.fileLocation)) {
-  //     return schemaDefinition.filter(c => !fs.existsSync(`${this.fileLocation}/${c.name}.json`));
-  //   } else {
-  //     fs.mkdirSync(this.fileLocation);
-  //     return schemaDefinition;
-  //   }
-  // }
-
-  // private groupData(newData: IServerData[]): IGroupedServerData[] {
-  //   const collections: IGroupedServerData[] = [];
-  //   for (const sd of newData) {
-  //     for (const d of sd.data) {
-  //       const colInd = collections.findIndex(c => c.collectionName === d.collectionName);
-  //       if (colInd !== -1) {
-  //         collections[colInd].data.push({ data: d.payload, id: d.id });
-  //       } else {
-  //         collections.push({ collectionName: d.collectionName, data: [{ data: d.payload, id: d.id }] });
-  //       }
-  //     }
-  //   }
-  //   return collections;
-  // }
-
-  // private addCollection(collection: ICollectionDefinition) {
-  //   fs.writeFileSync(`${this.fileLocation}/${collection.name}.json`, [], 'utf-8');
-  // }
-
-  // private upsertGroupedData(groupedData: IGroupedServerData[]) {
-  //   groupedData.forEach(gd => {
-  //     // Check to make sure schema fits with data
-  //     const currentFile = `${this.fileLocation}/${gd.collectionName}.json`;
-  //     if (fs.existsSync(currentFile)) {
-  //       const fileContent = fs.readFileSync(currentFile, 'utf-8');
-  //       const collectionData = JSON.parse(fileContent) as IServerDataItem[];
-  //       gd.data.forEach(sd => this.upsertSingleItem(sd, collectionData));
-  //     }
-  //   });
-  // }
-
-  // private upsertSingleItem(serverDataItem: IServerDataItem, collectionData: IServerDataItem[]) {
-  //   const colInd = collectionData.findIndex(c => c.id === serverDataItem.id);
-  //   if (colInd !== -1) {
-  //     collectionData[colInd] = serverDataItem;
-  //   } else {
-  //     collectionData.push(serverDataItem);
-  //   }
-  // }
 }
