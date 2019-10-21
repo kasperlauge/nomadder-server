@@ -53,7 +53,7 @@ export function setup(configuration: IConfig) {
           // tslint:disable-next-line: no-console
           console.log('Payload: ', JSON.stringify(payload));
           if (verifyIntegrity(payload)) {
-            extractNew(payload.data, db)
+            extractNew(payload.data, db, payload.schemaDefinition)
               .pipe(take(1))
               .subscribe(processedData => {
                 processedData.forEach(data => {
@@ -67,7 +67,7 @@ export function setup(configuration: IConfig) {
                   .map(d => ({ data: d.data, serverId: d.serverId, timestamp: d.timestamp } as IServerData));
                 // tslint:disable-next-line: no-console
                 console.log('New Data: ', JSON.stringify(processedData));
-                config.persistenceStrategy.persistNewData(newData, payload.schemaDefinition);
+                // config.persistenceStrategy.persistNewData(newData, payload.schemaDefinition);
               });
           }
           break;
