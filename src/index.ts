@@ -67,7 +67,7 @@ export function setup(configuration: IConfig) {
                   .map(d => ({ data: d.data, serverId: d.serverId, timestamp: d.timestamp } as IServerData));
                 // tslint:disable-next-line: no-console
                 console.log('New Data: ', JSON.stringify(processedData));
-                // config.persistenceStrategy.persistNewData(newData, payload.schemaDefinition);
+                config.persistenceStrategy.persistNewData(newData, payload.schemaDefinition);
               });
           }
           break;
@@ -76,14 +76,13 @@ export function setup(configuration: IConfig) {
           console.error('[Unknown event type]: ', msg.event);
           break;
       }
-
-      // Continuesly cache data
     });
   });
-  db.asObservable()
-    .subscribe(localData => {
-      config.persistenceStrategy.persistData(localData, config.fileLocation);
-    });
+
+  // Continuesly cache data
+  db.asObservable().subscribe(localData => {
+    config.persistenceStrategy.persistData(localData, config.fileLocation);
+  });
 
   return true;
 }
