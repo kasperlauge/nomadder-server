@@ -45,5 +45,8 @@
   ],
   "peerDependencies": {
     "ws": "^7.1.2"
+  },
+  "dependencies": {
+    "rxjs": "^6.5.3"
   }
 }
