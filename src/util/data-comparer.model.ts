@@ -46,12 +46,15 @@ export function extractNew(
         timestamp: n.timestamp,
       })) as IServerDataInfo[];
 
-      // Remove potential duplicates which are both in newInfo and serverDataInfos
-      // tslint:disable: no-console
-      console.log("serverDataInfos: ", JSON.stringify(serverDataInfos));
-    const serverDataFlattened = serverDataInfos.filter(sdi => newInfo.findIndex(ni => ni.serverId === sdi.serverId) !== -1);
+    // Remove potential duplicates which are both in newInfo and serverDataInfos
+    // tslint:disable: no-console
+    console.log('serverDataInfos: ', JSON.stringify(serverDataInfos));
+    const serverDataFlattened = serverDataInfos.filter(sdi => {
+      const isInNewInfo = newInfo.findIndex(ni => ni.serverId === sdi.serverId) !== -1;
+      return !isInNewInfo;
+    });
     // Handle the data saved
-      console.log("serverDataFlattened: ", JSON.stringify(serverDataFlattened));
+    console.log('serverDataFlattened: ', JSON.stringify(serverDataFlattened));
     console.log('newInfo: ', JSON.stringify(newInfo));
     const localDb = saveNewData(localData, newServerData, schemaDefinition);
     // Append server data stored about other servers
