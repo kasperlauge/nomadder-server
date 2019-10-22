@@ -35,8 +35,8 @@ export function setup(configuration: IConfig) {
   wss.addListener('connection', ws => {
     // tslint:disable: no-console
     console.log("websocket",ws);
-    console.log("ListenerCount", ws.listenerCount);
-    console.log("Listeners", ws.listeners);
+    console.log("ListenerCount", ws.listenerCount("connection"));
+    console.log("Listeners", ws.listeners("connection"));
     ws.addListener('message', message => {
       // Parse message data
       let msg = null;
