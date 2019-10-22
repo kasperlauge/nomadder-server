@@ -33,7 +33,10 @@ export function extractNew(
         }
         similar.timestamp = serverData.timestamp;
       } else {
-        newServerData.push({ ...serverData, redundancyIndex });
+        const sd = { ...serverData, redundancyIndex } as IServerDataIndication;
+        // tslint:disable-next-line: no-console
+        console.log("ServerData: ", JSON.stringify(sd));
+        newServerData.push(sd);
       }
     });
     const newInfo = newServerData
@@ -46,11 +49,7 @@ export function extractNew(
     // Handle the data saved
     // tslint:disable-next-line: no-console
     console.log("newServerData: ", JSON.stringify(newServerData));
-    // tslint:disable-next-line: no-console
-    console.log("LocalData: ", JSON.stringify(localData));
     const localDb = saveNewData(localData, newServerData, schemaDefinition);
-    // tslint:disable-next-line: no-console
-    console.log("LocalDb: ", JSON.stringify(localDb));
     // Append server data stored about other servers
     const localDbWithServerData = Object.assign({}, localDb, { serverDataInfo: [...serverDataInfos, ...newInfo] });
     db.next(localDbWithServerData);
