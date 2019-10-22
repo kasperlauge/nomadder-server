@@ -9,6 +9,7 @@ import { IServerDataInfo } from '../models/server-data-info.model';
 import { IServerDataItem } from '../models/server-data-item.model';
 import { IServerData } from '../models/server-data.model';
 import { ISyncEventPayload } from '../models/sync-event-payload.model';
+import { IPersistanceStrategy } from '../models/persistance-strategy.model';
 
 export function extractNew(
   data: IData,
@@ -67,8 +68,9 @@ export function verifyIntegrity(payload: ISyncEventPayload) {
   return true;
 }
 
-export function hydrateData(localData: BehaviorSubject<ILocalData>) {
-  // TODO: Add data based on local cache
+export function hydrateData(localData: BehaviorSubject<ILocalData>, persistanceStrategy: IPersistanceStrategy) {
+  const cache = persistanceStrategy.retrieveCache();
+  localData.next(cache);
   return;
 }
 
