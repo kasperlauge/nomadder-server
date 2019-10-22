@@ -33,6 +33,10 @@ export function setup(configuration: IConfig) {
 
   const wss = config.websocket;
   wss.addListener('connection', ws => {
+    // tslint:disable: no-console
+    console.log("websocket",ws);
+    console.log("ListenerCount", ws.listenerCount);
+    console.log("Listeners", ws.listeners);
     ws.addListener('message', message => {
       // Parse message data
       let msg = null;
@@ -50,8 +54,6 @@ export function setup(configuration: IConfig) {
       switch (msg.event) {
         case EventTypes.SYNC:
           const payload = msg.payload as ISyncEventPayload;
-          // tslint:disable-next-line: no-console
-          console.log('Payload: ', JSON.stringify(payload));
           if (verifyIntegrity(payload)) {
             extractNew(payload.data, db, payload.schemaDefinition)
               .pipe(take(1))
@@ -65,9 +67,6 @@ export function setup(configuration: IConfig) {
                 const newData = processedData
                   .filter(d => d.redundancyIndex < config.redundancyLimit)
                   .map(d => ({ data: d.data, serverId: d.serverId, timestamp: d.timestamp } as IServerData));
-                // tslint:disable-next-line: no-console
-                console.log('New Data: ', JSON.stringify(processedData));
-                // config.persistenceStrategy.persistNewData(newData, payload.schemaDefinition);
               });
           }
           break;
