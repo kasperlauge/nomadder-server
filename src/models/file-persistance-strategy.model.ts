@@ -50,7 +50,7 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
     if (fs.existsSync(collectionPath)) {
       const fileNames = fs.readdirSync(collectionPath, "utf-8");
       fileNames.forEach(fileName => {
-        const collectionData = fs.readFileSync(`${collectionPath}/${fileName}.json`, "utf-8");
+        const collectionData = fs.readFileSync(`${collectionPath}/${fileName}`, "utf-8");
         const collectionDataJson = JSON.parse(collectionData) as IServerDataItem[];
         const groupedServerDataItem = {collectionName: fileName.slice(0,-5), data: collectionDataJson} as IGroupedServerData;
         localData.groupedServerData.push(groupedServerDataItem);
