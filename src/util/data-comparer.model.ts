@@ -20,22 +20,21 @@ export function extractNew(
     const serverDataInfos = localData.serverDataInfo;
     const newServerData: IServerDataIndication[] = [];
     data.serverData.forEach(serverData => {
-      let redundancyIndex = 0;
+      const redundancyIndex = 0;
       const similarIndex = serverDataInfos.findIndex(s => s.serverId === serverData.serverId);
       const similar = serverDataInfos[similarIndex];
       // If we already have the data, and the timestamp is newer or the same then it isn't new data
       if (similar) {
         if (new Date(similar.timestamp) >= new Date(serverData.timestamp)) {
-          redundancyIndex = similar.redundancyIndex + 1;
+          similar.redundancyIndex++;
         } else {
           const sd = { ...serverData, redundancyIndex } as IServerDataIndication;
+          similar.redundancyIndex = 0;
+          similar.timestamp = serverData.timestamp;
           newServerData.push(sd);
         }
-        similar.timestamp = serverData.timestamp;
       } else {
         const sd = { ...serverData, redundancyIndex } as IServerDataIndication;
-        // tslint:disable-next-line: no-console
-        console.log('ServerData: ', JSON.stringify(sd));
         newServerData.push(sd);
       }
     });
@@ -46,12 +45,15 @@ export function extractNew(
         serverId: n.serverId,
         timestamp: n.timestamp,
       })) as IServerDataInfo[];
+
+      // Remove potential duplicates which are both in newInfo and serverDataInfos
+    const serverDataFlattened = serverDataInfos.filter(sdi => newInfo.findIndex(ni => ni.serverId === sdi.serverId) !== -1);
     // Handle the data saved
     // tslint:disable-next-line: no-console
     console.log('newServerData: ', JSON.stringify(newServerData));
     const localDb = saveNewData(localData, newServerData, schemaDefinition);
     // Append server data stored about other servers
-    const localDbWithServerData = Object.assign({}, localDb, { serverDataInfo: [...serverDataInfos, ...newInfo] });
+    const localDbWithServerData = Object.assign({}, localDb, { serverDataInfo: [...serverDataFlattened, ...newInfo] });
     db.next(localDbWithServerData);
     serverDataIndication.next(newServerData);
   });
