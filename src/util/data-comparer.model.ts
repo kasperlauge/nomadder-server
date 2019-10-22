@@ -44,7 +44,13 @@ export function extractNew(
         timestamp: n.timestamp,
       })) as IServerDataInfo[];
     // Handle the data saved
+    // tslint:disable-next-line: no-console
+    console.log("newServerData: ", JSON.stringify(newServerData));
+    // tslint:disable-next-line: no-console
+    console.log("LocalData: ", JSON.stringify(localData));
     const localDb = saveNewData(localData, newServerData, schemaDefinition);
+    // tslint:disable-next-line: no-console
+    console.log("LocalDb: ", JSON.stringify(localDb));
     // Append server data stored about other servers
     const localDbWithServerData = Object.assign({}, localDb, { serverDataInfo: [...serverDataInfos, ...newInfo] });
     db.next(localDbWithServerData);
