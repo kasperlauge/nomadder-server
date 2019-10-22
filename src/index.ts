@@ -81,7 +81,7 @@ export function setup(configuration: IConfig) {
 
   // Continuesly cache data
   db.asObservable().subscribe(localData => {
-    config.persistenceStrategy.persistData(localData, config.fileLocation);
+    config.persistenceStrategy.persistData(localData);
   });
 
   return true;
