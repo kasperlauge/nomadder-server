@@ -4,12 +4,12 @@ import { ICollectionDefinition } from '../models/collection-definition.model';
 import { IData } from '../models/data.model';
 import { IGroupedServerData } from '../models/grouped-server-data.model';
 import { ILocalData } from '../models/local-data.model';
+import { IPersistanceStrategy } from '../models/persistance-strategy.model';
 import { IServerDataIndication } from '../models/server-data-indication.model';
 import { IServerDataInfo } from '../models/server-data-info.model';
 import { IServerDataItem } from '../models/server-data-item.model';
 import { IServerData } from '../models/server-data.model';
 import { ISyncEventPayload } from '../models/sync-event-payload.model';
-import { IPersistanceStrategy } from '../models/persistance-strategy.model';
 
 export function extractNew(
   data: IData,

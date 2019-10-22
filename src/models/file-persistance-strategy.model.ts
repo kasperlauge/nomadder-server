@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import { IFilePersistanceStrategyConfig } from './file-persistance-strategy-config.model';
+import { IGroupedServerData } from './grouped-server-data.model';
 import { ILocalData } from './local-data.model';
 import { IPersistanceStrategy } from './persistance-strategy.model';
 import { IServerDataItem } from './server-data-item.model';
-import { IGroupedServerData } from './grouped-server-data.model';
 
 export class FilePersistanceStrategy implements IPersistanceStrategy {
   private fileLocation: string;
@@ -41,18 +41,21 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
   public retrieveCache(): ILocalData {
     const localData = { serverDataInfo: [], groupedServerData: [] } as ILocalData;
     const serverDataPath = `${this.fileLocation}/server-data.json`;
-    const  collectionPath = `${this.fileLocation}/collections`;
+    const collectionPath = `${this.fileLocation}/collections`;
     if (fs.existsSync(serverDataPath)) {
-      const serverData = fs.readFileSync(`${this.fileLocation}/server-data.json`, "utf-8");
+      const serverData = fs.readFileSync(`${this.fileLocation}/server-data.json`, 'utf-8');
       const serverDataInfo = JSON.parse(serverData);
       localData.serverDataInfo = serverDataInfo;
     }
     if (fs.existsSync(collectionPath)) {
-      const fileNames = fs.readdirSync(collectionPath, "utf-8");
+      const fileNames = fs.readdirSync(collectionPath, 'utf-8');
       fileNames.forEach(fileName => {
-        const collectionData = fs.readFileSync(`${collectionPath}/${fileName}`, "utf-8");
+        const collectionData = fs.readFileSync(`${collectionPath}/${fileName}`, 'utf-8');
         const collectionDataJson = JSON.parse(collectionData) as IServerDataItem[];
-        const groupedServerDataItem = {collectionName: fileName.slice(0,-5), data: collectionDataJson} as IGroupedServerData;
+        const groupedServerDataItem = {
+          collectionName: fileName.slice(0, -5),
+          data: collectionDataJson,
+        } as IGroupedServerData;
         localData.groupedServerData.push(groupedServerDataItem);
       });
     }

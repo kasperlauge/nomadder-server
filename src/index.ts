@@ -1,5 +1,5 @@
 import { BehaviorSubject, timer } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { IConfig, IConfigParameters } from './models/config.model';
 import { FilePersistanceStrategy } from './models/file-persistance-strategy.model';
 import { ILocalData } from './models/local-data.model';
