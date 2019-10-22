@@ -23,8 +23,10 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
     const collectionLocation = `${fileLocation}/collections`;
     if (fs.existsSync(collectionLocation)) {
       db.groupedServerData.forEach(gds => {
-        fs.writeFile(`${collectionLocation}/${gds.collectionName}.json`, JSON.stringify(gds.data), () => {
+        fs.writeFile(`${collectionLocation}/${gds.collectionName}.json`, JSON.stringify(gds.data), error => {
           // Do nothing
+          // tslint:disable-next-line: no-console
+          console.log('Error?:', error);
         });
       });
     } else {

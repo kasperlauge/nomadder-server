@@ -26,16 +26,16 @@ export function extractNew(
       // If we already have the data, and the timestamp is newer or the same then it isn't new data
       if (similar) {
         if (new Date(similar.timestamp) >= new Date(serverData.timestamp)) {
-          similar.redundancyIndex++;
-          redundancyIndex = similar.redundancyIndex;
+          redundancyIndex = similar.redundancyIndex + 1;
         } else {
-          similar.redundancyIndex = 0;
+          const sd = { ...serverData, redundancyIndex } as IServerDataIndication;
+          newServerData.push(sd);
         }
         similar.timestamp = serverData.timestamp;
       } else {
         const sd = { ...serverData, redundancyIndex } as IServerDataIndication;
         // tslint:disable-next-line: no-console
-        console.log("ServerData: ", JSON.stringify(sd));
+        console.log('ServerData: ', JSON.stringify(sd));
         newServerData.push(sd);
       }
     });
@@ -48,7 +48,7 @@ export function extractNew(
       })) as IServerDataInfo[];
     // Handle the data saved
     // tslint:disable-next-line: no-console
-    console.log("newServerData: ", JSON.stringify(newServerData));
+    console.log('newServerData: ', JSON.stringify(newServerData));
     const localDb = saveNewData(localData, newServerData, schemaDefinition);
     // Append server data stored about other servers
     const localDbWithServerData = Object.assign({}, localDb, { serverDataInfo: [...serverDataInfos, ...newInfo] });

@@ -1,4 +1,4 @@
-import { IServerDataPayload } from "./server-data-payload.model";
+import { IServerDataPayload } from './server-data-payload.model';
 
 export interface IServerDataIndication {
   serverId: any;
