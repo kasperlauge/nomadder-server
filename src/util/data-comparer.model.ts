@@ -149,4 +149,6 @@ export function upsertSingleItem(serverDataItem: IServerDataItem, dataGroup: IGr
   } else {
     dataGroup.data.push(serverDataItem);
   }
+  // tslint:disable: no-console
+  console.log("DataGroup: ", JSON.stringify(dataGroup));
 }
