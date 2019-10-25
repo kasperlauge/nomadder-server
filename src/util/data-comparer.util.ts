@@ -13,11 +13,10 @@ import { ISyncEventPayload } from '../models/sync-event-payload.model';
 
   // tslint:disable: no-console
 
-export function extractNew(data: IServerData, db: BehaviorSubject<ILocalData>): Observable<IServerDataIndication[]> {
-  const serverDataIndication = new Subject<IServerDataIndication[]>();
+export function extractNew(data: IServerData, db: BehaviorSubject<ILocalData>): Observable<void> {
+  const serverDataIndication = new Subject<void>();
   db.pipe(take(1)).subscribe(localData => {
     // const serverDataInfos = localData.serverDataInfo;
-    const newServerData: IServerDataIndication[] = [];
     const serverData = data;
     // tslint:disable-next-line: no-console
     console.log("New Data: ",JSON.stringify(data));
@@ -58,7 +57,7 @@ export function extractNew(data: IServerData, db: BehaviorSubject<ILocalData>): 
     // Append server data stored about other servers
     // const localDbWithServerData = Object.assign({}, localDb, { serverDataInfo: [...serverDataFlattened, ...newInfo] });
     db.next(localDb);
-    serverDataIndication.next(newServerData);
+    serverDataIndication.next();
   });
   return serverDataIndication.asObservable();
 }
