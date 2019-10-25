@@ -11,6 +11,8 @@ import { IServerDataItem } from '../models/server-data-item.model';
 import { IServerData } from '../models/server-data.model';
 import { ISyncEventPayload } from '../models/sync-event-payload.model';
 
+  // tslint:disable: no-console
+
 export function extractNew(data: IServerData, db: BehaviorSubject<ILocalData>): Observable<IServerDataIndication[]> {
   const serverDataIndication = new Subject<IServerDataIndication[]>();
   db.pipe(take(1)).subscribe(localData => {
@@ -136,19 +138,22 @@ export function upsertGroupedData(db: ILocalData, groupedData: IGroupedServerDat
 export function upsertSingleItem(serverDataItem: IServerDataItem, dataGroup: IGroupedServerData) {
   const colInd = dataGroup.data.findIndex(c => c.id === serverDataItem.id);
   if (colInd !== -1) {
+    console.log("Item exists");
     let dbItem = dataGroup.data[colInd];
     // If the data in the db is newer or the same as add unique server if not existing already
     if (new Date(dbItem.timestamp) >= new Date(serverDataItem.timestamp)) {
+      console.log("Item is older");
       const serverIdIndex = dbItem.uniqueServerIds.findIndex(id => id === serverDataItem.id);
       if (serverIdIndex === -1) {
+        console.log("New serverId");
         dbItem.uniqueServerIds.push(serverDataItem.id);
       }
     } else {
+      console.log("Item is newer");
       dbItem = serverDataItem;
     }
   } else {
     dataGroup.data.push(serverDataItem);
   }
-  // tslint:disable: no-console
   console.log("DataGroup: ", JSON.stringify(dataGroup));
 }
