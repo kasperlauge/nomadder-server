@@ -150,7 +150,9 @@ export function upsertSingleItem(serverDataItem: IServerDataItem, dataGroup: IGr
       }
     } else {
       console.log("Item is newer");
+      console.log("dbItem: ", JSON.stringify(dbItem));
       dbItem = serverDataItem;
+      console.log("dbItem after: ", JSON.stringify(dbItem));
     }
   } else {
     dataGroup.data.push(serverDataItem);
