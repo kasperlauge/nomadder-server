@@ -34,7 +34,7 @@ export function setup(configuration: IConfig) {
   const wss = config.websocket;
   wss.addListener('connection', ws => {
     // tslint:disable: no-console
-    
+
     // wss.clients.forEach(client => {
     //   client.
     // });
@@ -64,7 +64,6 @@ export function setup(configuration: IConfig) {
                 //     // Do something to indicate that a client can delete this data
                 //   }
                 // });
-
                 // const newData = processedData
                 //   .filter(d => d.redundancyIndex < config.redundancyLimit)
                 //   .map(d => ({ data: d.data, serverId: d.serverId, timestamp: d.timestamp } as IServerData));

@@ -11,10 +11,7 @@ import { IServerDataItem } from '../models/server-data-item.model';
 import { IServerData } from '../models/server-data.model';
 import { ISyncEventPayload } from '../models/sync-event-payload.model';
 
-export function extractNew(
-  data: IServerData,
-  db: BehaviorSubject<ILocalData>,
-): Observable<IServerDataIndication[]> {
+export function extractNew(data: IServerData, db: BehaviorSubject<ILocalData>): Observable<IServerDataIndication[]> {
   const serverDataIndication = new Subject<IServerDataIndication[]>();
   db.pipe(take(1)).subscribe(localData => {
     // const serverDataInfos = localData.serverDataInfo;
@@ -101,14 +98,22 @@ export function addCollections(db: ILocalData, collectionsToAdd: ICollectionDefi
 export function groupData(serverData: IServerData): IGroupedServerData[] {
   const collections: IGroupedServerData[] = [];
   const sd = serverData;
-    for (const d of sd.data) {
-      const colInd = collections.findIndex(c => c.collectionName === d.collectionName);
-      if (colInd !== -1) {
-        collections[colInd].data.push({ data: d.payload, id: d.id, timestamp: d.timestamp, uniqueServerIds: [sd.serverId] });
-      } else {
-        collections.push({ collectionName: d.collectionName, data: [{ data: d.payload, id: d.id, timestamp: d.timestamp, uniqueServerIds: [sd.serverId] }] });
-      }
+  for (const d of sd.data) {
+    const colInd = collections.findIndex(c => c.collectionName === d.collectionName);
+    if (colInd !== -1) {
+      collections[colInd].data.push({
+        data: d.payload,
+        id: d.id,
+        timestamp: d.timestamp,
+        uniqueServerIds: [sd.serverId],
+      });
+    } else {
+      collections.push({
+        collectionName: d.collectionName,
+        data: [{ data: d.payload, id: d.id, timestamp: d.timestamp, uniqueServerIds: [sd.serverId] }],
+      });
     }
+  }
   return collections;
 }
 
