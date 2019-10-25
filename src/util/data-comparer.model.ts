@@ -141,7 +141,7 @@ export function upsertSingleItem(serverDataItem: IServerDataItem, dataGroup: IGr
     console.log("Item exists");
     const dbItem = dataGroup.data[colInd];
     // If the data in the db is newer or the same as add unique server if not existing already
-    if (new Date(dbItem.timestamp) > new Date(serverDataItem.timestamp)) {
+    if (new Date(dbItem.timestamp) >= new Date(serverDataItem.timestamp)) {
       console.log("Item is older");
       const serverIdIndex = dbItem.uniqueServerIds.findIndex(id => id === serverDataItem.id);
       if (serverIdIndex === -1) {
