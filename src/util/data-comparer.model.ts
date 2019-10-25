@@ -150,7 +150,7 @@ export function upsertSingleItem(serverDataItem: IServerDataItem, dataGroup: IGr
 
     if (new Date(dataGroup.data[colInd].timestamp).getTime() === new Date(serverDataItem.timestamp).getTime()) {
       console.log("Item is the same");
-      const serverIdIndex = dataGroup.data[colInd].uniqueServerIds.findIndex(id => id === serverDataItem.id);
+      const serverIdIndex = dataGroup.data[colInd].uniqueServerIds.findIndex(id => id === serverDataItem.uniqueServerIds[0]);
       if (serverIdIndex === -1) {
         console.log("New serverId");
         dataGroup.data[colInd].uniqueServerIds.push(serverDataItem.uniqueServerIds[0]);
