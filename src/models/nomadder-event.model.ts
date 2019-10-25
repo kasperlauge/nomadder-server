@@ -3,7 +3,7 @@ import { ISyncEventPayload } from './sync-event-payload.model';
 
 export enum EventTypes {
   SYNC = 'SYNC',
-  BATCH = 'BATCH'
+  BATCH = 'BATCH',
 }
 
 export type ProtocolType = 'NOMADDER';

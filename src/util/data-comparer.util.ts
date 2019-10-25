@@ -11,7 +11,7 @@ import { IServerDataItem } from '../models/server-data-item.model';
 import { IServerData } from '../models/server-data.model';
 import { ISyncEventPayload } from '../models/sync-event-payload.model';
 
-  // tslint:disable: no-console
+// tslint:disable: no-console
 
 export function extractNew(data: IServerData, db: BehaviorSubject<ILocalData>): Observable<void> {
   const serverDataIndication = new Subject<void>();
@@ -19,9 +19,9 @@ export function extractNew(data: IServerData, db: BehaviorSubject<ILocalData>): 
     // const serverDataInfos = localData.serverDataInfo;
     const serverData = data;
     // tslint:disable-next-line: no-console
-    console.log("New Data: ",JSON.stringify(data));
+    console.log('New Data: ', JSON.stringify(data));
     // tslint:disable-next-line: no-console
-    console.log("Database: ",JSON.stringify(localData));
+    console.log('Database: ', JSON.stringify(localData));
     //   const redundancyIndex = 0;
     //   const similarIndex = serverDataInfos.findIndex(s => s.serverId === serverData.serverId);
     //   const similar = serverDataInfos[similarIndex];
@@ -137,31 +137,33 @@ export function upsertGroupedData(db: ILocalData, groupedData: IGroupedServerDat
 export function upsertSingleItem(serverDataItem: IServerDataItem, dataGroup: IGroupedServerData) {
   const colInd = dataGroup.data.findIndex(c => c.id === serverDataItem.id);
   if (colInd !== -1) {
-    console.log("Item exists");
+    console.log('Item exists');
     // If the data in the db is newer or the same as add unique server if not existing already
-    console.log("old timestamp: ", dataGroup.data[colInd].timestamp);
-    console.log("new timestamp: ", serverDataItem.timestamp);
+    console.log('old timestamp: ', dataGroup.data[colInd].timestamp);
+    console.log('new timestamp: ', serverDataItem.timestamp);
 
     if (new Date(dataGroup.data[colInd].timestamp) > new Date(serverDataItem.timestamp)) {
-      console.log("Item is older");
+      console.log('Item is older');
       return;
     }
 
     if (new Date(dataGroup.data[colInd].timestamp).getTime() === new Date(serverDataItem.timestamp).getTime()) {
-      console.log("Item is the same");
-      const serverIdIndex = dataGroup.data[colInd].uniqueServerIds.findIndex(id => id === serverDataItem.uniqueServerIds[0]);
+      console.log('Item is the same');
+      const serverIdIndex = dataGroup.data[colInd].uniqueServerIds.findIndex(
+        id => id === serverDataItem.uniqueServerIds[0],
+      );
       if (serverIdIndex === -1) {
-        console.log("New serverId");
+        console.log('New serverId');
         dataGroup.data[colInd].uniqueServerIds.push(serverDataItem.uniqueServerIds[0]);
       }
     } else {
-      console.log("Item is newer");
-      console.log("dbItem: ", JSON.stringify(dataGroup.data[colInd]));
+      console.log('Item is newer');
+      console.log('dbItem: ', JSON.stringify(dataGroup.data[colInd]));
       dataGroup.data[colInd] = serverDataItem;
-      console.log("dbItem after: ", JSON.stringify(dataGroup.data[colInd]));
+      console.log('dbItem after: ', JSON.stringify(dataGroup.data[colInd]));
     }
   } else {
     dataGroup.data.push(serverDataItem);
   }
-  console.log("DataGroup: ", JSON.stringify(dataGroup));
+  console.log('DataGroup: ', JSON.stringify(dataGroup));
 }

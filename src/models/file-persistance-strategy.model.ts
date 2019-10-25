@@ -34,7 +34,7 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
   }
 
   public retrieveCache(): ILocalData {
-    const localData = { groupedServerData: [] } as ILocalData;
+    const localData = { id: null, groupedServerData: [] } as ILocalData;
     const collectionPath = `${this.fileLocation}/collections`;
     if (fs.existsSync(collectionPath)) {
       const fileNames = fs.readdirSync(collectionPath, 'utf-8');
@@ -48,6 +48,7 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
         localData.groupedServerData.push(groupedServerDataItem);
       });
     }
+    // TODO: get cached ID somewhere aswell
     return localData;
   }
 }

@@ -70,10 +70,9 @@ export function setup(configuration: IConfig) {
                 const numberOfClientsConnected = wss.clients.size;
                 const redundancyFactor = config.redundancyFactor;
                 generateBatches(db, redundancyFactor, numberOfClientsConnected)
-                .pipe(take(1))
-                .subscribe(batches => {
-
-                });
+                  .pipe(take(1))
+                  // tslint:disable-next-line: no-empty
+                  .subscribe(batches => {});
               });
           }
           break;

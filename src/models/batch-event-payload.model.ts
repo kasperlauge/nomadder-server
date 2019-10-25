@@ -1,4 +1,4 @@
-import { IServerData } from "./server-data.model";
+import { IServerData } from './server-data.model';
 
 export interface IBatchEventPayload {
   data: IServerData;
