@@ -147,7 +147,7 @@ export function upsertSingleItem(serverDataItem: IServerDataItem, dataGroup: IGr
       const serverIdIndex = dataGroup.data[colInd].uniqueServerIds.findIndex(id => id === serverDataItem.id);
       if (serverIdIndex === -1) {
         console.log("New serverId");
-        dataGroup.data[colInd].uniqueServerIds.push(serverDataItem.id);
+        dataGroup.data[colInd].uniqueServerIds.push(serverDataItem.uniqueServerIds[0]);
       }
     } else {
       console.log("Item is newer");
