@@ -12,51 +12,49 @@ import { IServerData } from '../models/server-data.model';
 import { ISyncEventPayload } from '../models/sync-event-payload.model';
 
 export function extractNew(
-  data: IData,
+  data: IServerData,
   db: BehaviorSubject<ILocalData>,
-  schemaDefinition: ICollectionDefinition[],
 ): Observable<IServerDataIndication[]> {
   const serverDataIndication = new Subject<IServerDataIndication[]>();
   db.pipe(take(1)).subscribe(localData => {
-    const serverDataInfos = localData.serverDataInfo;
+    // const serverDataInfos = localData.serverDataInfo;
     const newServerData: IServerDataIndication[] = [];
-    data.serverData.forEach(serverData => {
-      const redundancyIndex = 0;
-      const similarIndex = serverDataInfos.findIndex(s => s.serverId === serverData.serverId);
-      const similar = serverDataInfos[similarIndex];
-      // If we already have the data, and the timestamp is newer or the same then it isn't new data
-      if (similar) {
-        if (new Date(similar.timestamp) >= new Date(serverData.timestamp)) {
-          similar.redundancyIndex++;
-        } else {
-          const sd = { ...serverData, redundancyIndex } as IServerDataIndication;
-          similar.redundancyIndex = 0;
-          similar.timestamp = serverData.timestamp;
-          newServerData.push(sd);
-        }
-      } else {
-        const sd = { ...serverData, redundancyIndex } as IServerDataIndication;
-        newServerData.push(sd);
-      }
-    });
-    const newInfo = newServerData
-      .filter(n => n.redundancyIndex === 0)
-      .map(n => ({
-        redundancyIndex: n.redundancyIndex,
-        serverId: n.serverId,
-        timestamp: n.timestamp,
-      })) as IServerDataInfo[];
+    const serverData = data;
+    //   const redundancyIndex = 0;
+    //   const similarIndex = serverDataInfos.findIndex(s => s.serverId === serverData.serverId);
+    //   const similar = serverDataInfos[similarIndex];
+    //   // If we already have the data, and the timestamp is newer or the same then it isn't new data
+    //   if (similar) {
+    //     if (new Date(similar.timestamp) >= new Date(serverData.timestamp)) {
+    //       similar.redundancyIndex++;
+    //     } else {
+    //       const sd = { ...serverData, redundancyIndex } as IServerDataIndication;
+    //       similar.redundancyIndex = 0;
+    //       similar.timestamp = serverData.timestamp;
+    //       newServerData.push(sd);
+    //     }
+    //   } else {
+    //     const sd = { ...serverData, redundancyIndex } as IServerDataIndication;
+    //     newServerData.push(sd);
+    //   }
+    // const newInfo = newServerData
+    //   .filter(n => n.redundancyIndex === 0)
+    //   .map(n => ({
+    //     redundancyIndex: n.redundancyIndex,
+    //     serverId: n.serverId,
+    //     timestamp: n.timestamp,
+    //   })) as IServerDataInfo[];
 
     // Remove potential duplicates which are both in newInfo and serverDataInfos
-    const serverDataFlattened = serverDataInfos.filter(sdi => {
-      const isInNewInfo = newInfo.findIndex(ni => ni.serverId === sdi.serverId) !== -1;
-      return !isInNewInfo;
-    });
+    // const serverDataFlattened = serverDataInfos.filter(sdi => {
+    //   const isInNewInfo = newInfo.findIndex(ni => ni.serverId === sdi.serverId) !== -1;
+    //   return !isInNewInfo;
+    // });
     // Handle the data saved
-    const localDb = saveNewData(localData, newServerData, schemaDefinition);
+    const localDb = saveNewData(localData, serverData, serverData.schemaDefinition);
     // Append server data stored about other servers
-    const localDbWithServerData = Object.assign({}, localDb, { serverDataInfo: [...serverDataFlattened, ...newInfo] });
-    db.next(localDbWithServerData);
+    // const localDbWithServerData = Object.assign({}, localDb, { serverDataInfo: [...serverDataFlattened, ...newInfo] });
+    db.next(localDb);
     serverDataIndication.next(newServerData);
   });
   return serverDataIndication.asObservable();
@@ -76,7 +74,7 @@ export function hydrateData(localData: BehaviorSubject<ILocalData>, persistanceS
 
 export function saveNewData(
   db: ILocalData,
-  newServerData: IServerData[],
+  newServerData: IServerData,
   schemaDefinition: ICollectionDefinition[],
 ): ILocalData {
   const collectionsToAdd = findCollectionsToAdd(db, schemaDefinition);
@@ -100,18 +98,17 @@ export function addCollections(db: ILocalData, collectionsToAdd: ICollectionDefi
   return db;
 }
 
-export function groupData(newServerData: IServerData[]): IGroupedServerData[] {
+export function groupData(serverData: IServerData): IGroupedServerData[] {
   const collections: IGroupedServerData[] = [];
-  for (const sd of newServerData) {
+  const sd = serverData;
     for (const d of sd.data) {
       const colInd = collections.findIndex(c => c.collectionName === d.collectionName);
       if (colInd !== -1) {
-        collections[colInd].data.push({ data: d.payload, id: d.id });
+        collections[colInd].data.push({ data: d.payload, id: d.id, timestamp: d.timestamp, uniqueServerIds: [sd.serverId] });
       } else {
-        collections.push({ collectionName: d.collectionName, data: [{ data: d.payload, id: d.id }] });
+        collections.push({ collectionName: d.collectionName, data: [{ data: d.payload, id: d.id, timestamp: d.timestamp, uniqueServerIds: [sd.serverId] }] });
       }
     }
-  }
   return collections;
 }
 
@@ -130,7 +127,16 @@ export function upsertGroupedData(db: ILocalData, groupedData: IGroupedServerDat
 export function upsertSingleItem(serverDataItem: IServerDataItem, dataGroup: IGroupedServerData) {
   const colInd = dataGroup.data.findIndex(c => c.id === serverDataItem.id);
   if (colInd !== -1) {
-    dataGroup.data[colInd] = serverDataItem;
+    let dbItem = dataGroup.data[colInd];
+    // If the data in the db is newer or the same as add unique server if not existing already
+    if (new Date(dbItem.timestamp) >= new Date(serverDataItem.timestamp)) {
+      const serverIdIndex = dbItem.uniqueServerIds.findIndex(id => id === serverDataItem.id);
+      if (serverIdIndex === -1) {
+        dbItem.uniqueServerIds.push(serverDataItem.id);
+      }
+    } else {
+      dbItem = serverDataItem;
+    }
   } else {
     dataGroup.data.push(serverDataItem);
   }

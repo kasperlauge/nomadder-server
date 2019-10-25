@@ -1,6 +1,6 @@
 import { IServerData } from './server-data.model';
 
 export interface IData {
-  serverData: IServerData[];
+  serverData: IServerData;
   timestamp: string;
 }

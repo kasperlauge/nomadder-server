@@ -28,14 +28,16 @@ export function setup(configuration: IConfig) {
     config.persistenceStrategy = new FilePersistanceStrategy({});
   }
 
-  const db = new BehaviorSubject<ILocalData>({ serverDataInfo: [], groupedServerData: [] });
+  const db = new BehaviorSubject<ILocalData>({ groupedServerData: [] });
   hydrateData(db, config.persistenceStrategy);
 
   const wss = config.websocket;
   wss.addListener('connection', ws => {
     // tslint:disable: no-console
     
-    console.log("websocket clients",wss.clients);
+    // wss.clients.forEach(client => {
+    //   client.
+    // });
     ws.addListener('message', message => {
       // Parse message data
       let msg = null;
@@ -54,18 +56,18 @@ export function setup(configuration: IConfig) {
         case EventTypes.SYNC:
           const payload = msg.payload as ISyncEventPayload;
           if (verifyIntegrity(payload)) {
-            extractNew(payload.data, db, payload.schemaDefinition)
+            extractNew(payload.data, db)
               .pipe(take(1))
               .subscribe(processedData => {
-                processedData.forEach(data => {
-                  if (data.redundancyIndex >= config.redundancyLimit) {
-                    // Do something to indicate that a client can delete this data
-                  }
-                });
+                // processedData.forEach(data => {
+                //   if (data.redundancyIndex >= config.redundancyLimit) {
+                //     // Do something to indicate that a client can delete this data
+                //   }
+                // });
 
-                const newData = processedData
-                  .filter(d => d.redundancyIndex < config.redundancyLimit)
-                  .map(d => ({ data: d.data, serverId: d.serverId, timestamp: d.timestamp } as IServerData));
+                // const newData = processedData
+                //   .filter(d => d.redundancyIndex < config.redundancyLimit)
+                //   .map(d => ({ data: d.data, serverId: d.serverId, timestamp: d.timestamp } as IServerData));
               });
           }
           break;
