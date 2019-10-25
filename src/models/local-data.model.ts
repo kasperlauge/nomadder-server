@@ -2,6 +2,6 @@ import { IGroupedServerData } from './grouped-server-data.model';
 import { IServerDataInfo } from './server-data-info.model';
 
 export interface ILocalData {
-  serverDataInfo: IServerDataInfo[];
+  id: any;
   groupedServerData: IGroupedServerData[];
 }

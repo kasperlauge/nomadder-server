@@ -1,12 +1,12 @@
-import { BehaviorSubject, timer } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { IConfig, IConfigParameters } from './models/config.model';
 import { FilePersistanceStrategy } from './models/file-persistance-strategy.model';
 import { ILocalData } from './models/local-data.model';
 import { EventTypes, INomadderEvent, NOMADDER_PROTOCOL } from './models/nomadder-event.model';
-import { IServerData } from './models/server-data.model';
 import { ISyncEventPayload } from './models/sync-event-payload.model';
-import { extractNew, hydrateData, verifyIntegrity } from './util/data-comparer.model';
+import { generateBatches } from './util/batch-managing.util';
+import { extractNew, hydrateData, verifyIntegrity } from './util/data-comparer.util';
 
 export function setup(configuration: IConfig) {
   const config = { ...configuration } as IConfigParameters;
@@ -24,18 +24,28 @@ export function setup(configuration: IConfig) {
   if (!config.redundancyLimit) {
     config.redundancyLimit = 3;
   }
+  if (!config.redundancyFactor) {
+    config.redundancyFactor = 3;
+  }
+  if (!config.serverId) {
+    config.serverId = new Date().getTime(); // TODO: stupid way to generate an ID - It could be a hash of the MAC address maybe?
+  }
   if (!config.persistenceStrategy) {
     config.persistenceStrategy = new FilePersistanceStrategy({});
   }
 
-  const db = new BehaviorSubject<ILocalData>({ serverDataInfo: [], groupedServerData: [] });
+  const id = config.serverId;
+
+  const db = new BehaviorSubject<ILocalData>({ id, groupedServerData: [] });
   hydrateData(db, config.persistenceStrategy);
 
   const wss = config.websocket;
   wss.addListener('connection', ws => {
     // tslint:disable: no-console
-    
-    console.log("websocket clients",wss.clients);
+
+    // wss.clients.forEach(client => {
+    //   client.
+    // });
     ws.addListener('message', message => {
       // Parse message data
       let msg = null;
@@ -54,18 +64,16 @@ export function setup(configuration: IConfig) {
         case EventTypes.SYNC:
           const payload = msg.payload as ISyncEventPayload;
           if (verifyIntegrity(payload)) {
-            extractNew(payload.data, db, payload.schemaDefinition)
+            extractNew(payload.data, db)
               .pipe(take(1))
-              .subscribe(processedData => {
-                processedData.forEach(data => {
-                  if (data.redundancyIndex >= config.redundancyLimit) {
-                    // Do something to indicate that a client can delete this data
-                  }
-                });
+              .subscribe(_ => {
+                const numberOfClientsConnected = wss.clients.size;
+                const redundancyFactor = config.redundancyFactor;
+                generateBatches(db, redundancyFactor, numberOfClientsConnected)
+                .pipe(take(1))
+                .subscribe(batches => {
 
-                const newData = processedData
-                  .filter(d => d.redundancyIndex < config.redundancyLimit)
-                  .map(d => ({ data: d.data, serverId: d.serverId, timestamp: d.timestamp } as IServerData));
+                });
               });
           }
           break;
@@ -78,7 +86,7 @@ export function setup(configuration: IConfig) {
   });
 
   // Continuesly cache data
-  db.asObservable().subscribe(localData => {
+  db.asObservable().subscribe((localData: ILocalData) => {
     config.persistenceStrategy.persistData(localData);
   });
 
