@@ -66,19 +66,8 @@ export function setup(configuration: IConfig) {
           if (verifyIntegrity(payload)) {
             extractNew(payload.data, db)
               .pipe(take(1))
-              .subscribe(_ => {
-                console.log("New data extracted");
-                const numberOfClientsConnected = wss.clients.size;
-                const redundancyFactor = config.redundancyFactor;
-                generateBatches(db, redundancyFactor, numberOfClientsConnected)
-                  .pipe(take(1))
-                  .subscribe(batches => {
-                    console.log("Batches: ", JSON.stringify(batches));
-                    const batchEvents = generateBatchEvents(batches);
-                    console.log("clients: ", JSON.stringify(wss.clients));
-                    wss.clients.forEach(c => c.send(JSON.stringify(batchEvents)));
-                  });
-              });
+              // tslint:disable-next-line: no-empty
+              .subscribe(_ => {});
           }
           break;
         default:
@@ -92,6 +81,14 @@ export function setup(configuration: IConfig) {
   // Continuesly cache data
   db.asObservable().subscribe((localData: ILocalData) => {
     config.persistenceStrategy.persistData(localData);
+    // Continuesly announce changes to clients
+    const numberOfClientsConnected = wss.clients.size;
+    const redundancyFactor = config.redundancyFactor;
+    const batches = generateBatches(localData, redundancyFactor, numberOfClientsConnected);
+    console.log("Batches: ", JSON.stringify(batches));
+    const batchEvents = generateBatchEvents(batches);
+    console.log("clients: ", JSON.stringify(wss.clients));
+    wss.clients.forEach(c => c.send(JSON.stringify(batchEvents)));
   });
 
   return true;

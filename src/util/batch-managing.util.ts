@@ -7,12 +7,11 @@ import { IServerDataPayload } from '../models/server-data-payload.model';
 import { IServerData } from '../models/server-data.model';
 
 export function generateBatches(
-  db: BehaviorSubject<ILocalData>,
+  db: ILocalData,
   redundancyFactor: number,
   clientsConnected: number,
-): Observable<IServerData[]> {
-  const batchData = new Subject<IServerData[]>();
-  db.pipe(take(1)).subscribe(localData => {
+): IServerData[] {
+  const localData = db;
     const totalDataPoints = localData.groupedServerData
       .map(group => group.data.length)
       .reduce((prev, curr) => prev + curr, 0);
@@ -57,9 +56,7 @@ export function generateBatches(
       batches.push(batch);
     }
 
-    batchData.next(batches);
-  });
-  return batchData;
+    return batches;
 }
 
 export function generateBatchEvents(batches: IServerData[]): INomadderEvent[] {
