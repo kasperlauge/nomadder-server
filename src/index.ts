@@ -72,7 +72,9 @@ export function setup(configuration: IConfig) {
                 generateBatches(db, redundancyFactor, numberOfClientsConnected)
                   .pipe(take(1))
                   .subscribe(batches => {
+                    console.log("Batches: ", JSON.stringify(batches));
                     const batchEvents = generateBatchEvents(batches);
+                    console.log("clients: ", JSON.stringify(wss.clients));
                     wss.clients.forEach(c => c.send(JSON.stringify(batchEvents)));
                   });
               });

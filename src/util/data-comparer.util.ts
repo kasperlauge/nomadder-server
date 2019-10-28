@@ -137,33 +137,22 @@ export function upsertGroupedData(db: ILocalData, groupedData: IGroupedServerDat
 export function upsertSingleItem(serverDataItem: IServerDataItem, dataGroup: IGroupedServerData) {
   const colInd = dataGroup.data.findIndex(c => c.id === serverDataItem.id);
   if (colInd !== -1) {
-    console.log('Item exists');
-    // If the data in the db is newer or the same as add unique server if not existing already
-    console.log('old timestamp: ', dataGroup.data[colInd].timestamp);
-    console.log('new timestamp: ', serverDataItem.timestamp);
 
     if (new Date(dataGroup.data[colInd].timestamp) > new Date(serverDataItem.timestamp)) {
-      console.log('Item is older');
       return;
     }
 
     if (new Date(dataGroup.data[colInd].timestamp).getTime() === new Date(serverDataItem.timestamp).getTime()) {
-      console.log('Item is the same');
       const serverIdIndex = dataGroup.data[colInd].uniqueServerIds.findIndex(
         id => id === serverDataItem.uniqueServerIds[0],
       );
       if (serverIdIndex === -1) {
-        console.log('New serverId');
         dataGroup.data[colInd].uniqueServerIds.push(serverDataItem.uniqueServerIds[0]);
       }
     } else {
-      console.log('Item is newer');
-      console.log('dbItem: ', JSON.stringify(dataGroup.data[colInd]));
       dataGroup.data[colInd] = serverDataItem;
-      console.log('dbItem after: ', JSON.stringify(dataGroup.data[colInd]));
     }
   } else {
     dataGroup.data.push(serverDataItem);
   }
-  console.log('DataGroup: ', JSON.stringify(dataGroup));
 }
