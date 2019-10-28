@@ -134,7 +134,6 @@ export function upsertGroupedData(db: ILocalData, groupedData: IGroupedServerDat
 export function upsertSingleItem(serverDataItem: IServerDataItem, dataGroup: IGroupedServerData) {
   const colInd = dataGroup.data.findIndex(c => c.id === serverDataItem.id);
   if (colInd !== -1) {
-
     if (new Date(dataGroup.data[colInd].timestamp) > new Date(serverDataItem.timestamp)) {
       return;
     }
