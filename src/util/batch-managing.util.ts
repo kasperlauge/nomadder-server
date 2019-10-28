@@ -2,6 +2,7 @@ import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { ICollectionDefinition } from '../models/collection-definition.model';
 import { ILocalData } from '../models/local-data.model';
+import { EventTypes, INomadderEvent, NOMADDER_PROTOCOL } from '../models/nomadder-event.model';
 import { IServerDataPayload } from '../models/server-data-payload.model';
 import { IServerData } from '../models/server-data.model';
 
@@ -59,4 +60,23 @@ export function generateBatches(
     batchData.next(batches);
   });
   return batchData;
+}
+
+export function generateBatchEvents(batches: IServerData[]): INomadderEvent[] {
+  return batches.map(
+    b =>
+      ({
+        event: EventTypes.BATCH,
+        payload: {
+          data: b,
+          hash: generateHash(b),
+        },
+        protocol: NOMADDER_PROTOCOL,
+      } as INomadderEvent),
+  );
+}
+
+export function generateHash(data: any) {
+  // TODO: Implement
+  return '123';
 }

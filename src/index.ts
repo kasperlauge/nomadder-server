@@ -5,7 +5,7 @@ import { FilePersistanceStrategy } from './models/file-persistance-strategy.mode
 import { ILocalData } from './models/local-data.model';
 import { EventTypes, INomadderEvent, NOMADDER_PROTOCOL } from './models/nomadder-event.model';
 import { ISyncEventPayload } from './models/sync-event-payload.model';
-import { generateBatches } from './util/batch-managing.util';
+import { generateBatches, generateBatchEvents } from './util/batch-managing.util';
 import { extractNew, hydrateData, verifyIntegrity } from './util/data-comparer.util';
 
 export function setup(configuration: IConfig) {
@@ -71,8 +71,10 @@ export function setup(configuration: IConfig) {
                 const redundancyFactor = config.redundancyFactor;
                 generateBatches(db, redundancyFactor, numberOfClientsConnected)
                   .pipe(take(1))
-                  // tslint:disable-next-line: no-empty
-                  .subscribe(batches => {});
+                  .subscribe(batches => {
+                    const batchEvents = generateBatchEvents(batches);
+                    wss.clients.forEach(c => c.send(JSON.stringify(batchEvents)));
+                  });
               });
           }
           break;
