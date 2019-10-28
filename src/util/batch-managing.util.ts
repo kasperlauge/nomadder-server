@@ -21,7 +21,9 @@ export function generateBatches(
         ? totalDataPoints * clientsConnected
         : numberOfBatchPoints;
     const duplicationFactor = Math.floor(actualNumberOfBatchPoints / totalDataPoints);
-
+    // tslint:disable: no-console
+    console.log("flat map ? ", localData.groupedServerData);
+    console.log("clients: ", clientsConnected);
     const dataPoints = localData.groupedServerData.flatMap<IServerDataPayload>(group =>
       group.data.map<IServerDataPayload>(item => ({
         collectionName: group.collectionName,
