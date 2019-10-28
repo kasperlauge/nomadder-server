@@ -88,7 +88,8 @@ export function setup(configuration: IConfig) {
     console.log('Batches: ', JSON.stringify(batches));
     const batchEvents = generateBatchEvents(batches);
     console.log('clients: ', JSON.stringify(wss.clients));
-    wss.clients.forEach(c => c.send(JSON.stringify(batchEvents)));
+    let i = 0;
+    wss.clients.forEach(c => c.send(JSON.stringify(batchEvents[++i])));
   });
 
   return true;

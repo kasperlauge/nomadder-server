@@ -18,17 +18,14 @@ export function generateBatches(db: ILocalData, redundancyFactor: number, client
   // tslint:disable: no-console
   console.log('flat map ? ', localData.groupedServerData);
   console.log('clients: ', clientsConnected);
-  const dataPoints = localData.groupedServerData
-    .map(group =>
-      group.data.map<IServerDataPayload>(item => ({
-        collectionName: group.collectionName,
-        id: item.id,
-        payload: item.data,
-        timestamp: item.timestamp,
-      })),
-    )
-    .flat(1);
-  console.log('Datapoints: ', JSON.stringify(dataPoints));
+  const dataPoints = localData.groupedServerData.flatMap<IServerDataPayload>(group =>
+    group.data.map<IServerDataPayload>(item => ({
+      collectionName: group.collectionName,
+      id: item.id,
+      payload: item.data,
+      timestamp: item.timestamp,
+    })),
+  );
   // Duplicate datapoints based on redundancy factor
   let redundantDatapoints = [...dataPoints];
   for (let i = 0; i < duplicationFactor - 1; i++) {
