@@ -19,9 +19,6 @@ export function extractNew(data: IServerData, db: BehaviorSubject<ILocalData>): 
     // const serverDataInfos = localData.serverDataInfo;
     const serverData = data;
     // tslint:disable-next-line: no-console
-    console.log('New Data: ', JSON.stringify(data));
-    // tslint:disable-next-line: no-console
-    console.log('Database: ', JSON.stringify(localData));
     //   const redundancyIndex = 0;
     //   const similarIndex = serverDataInfos.findIndex(s => s.serverId === serverData.serverId);
     //   const similar = serverDataInfos[similarIndex];

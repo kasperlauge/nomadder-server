@@ -67,6 +67,7 @@ export function setup(configuration: IConfig) {
             extractNew(payload.data, db)
               .pipe(take(1))
               .subscribe(_ => {
+                console.log("New data extracted");
                 const numberOfClientsConnected = wss.clients.size;
                 const redundancyFactor = config.redundancyFactor;
                 generateBatches(db, redundancyFactor, numberOfClientsConnected)
