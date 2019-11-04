@@ -18,6 +18,7 @@ export function generateBatches(db: ILocalData, redundancyFactor: number, client
   // tslint:disable: no-console
   console.log('flat map ? ', localData.groupedServerData);
   console.log('clients: ', clientsConnected);
+  console.log("id: ", localData.id)
   const dataPoints = localData.groupedServerData.flatMap<IServerDataPayload>(group =>
     group.data.map<IServerDataPayload>(item => ({
       collectionName: group.collectionName,
