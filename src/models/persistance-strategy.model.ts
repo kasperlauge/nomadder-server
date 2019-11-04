@@ -4,5 +4,5 @@ import { IServerData } from './server-data.model';
 
 export interface IPersistanceStrategy {
   persistData(db: ILocalData): void;
-  retrieveCache(): ILocalData;
+  retrieveCache(serverId: any): ILocalData;
 }

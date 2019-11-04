@@ -33,8 +33,8 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
     }
   }
 
-  public retrieveCache(): ILocalData {
-    const localData = { id: null, groupedServerData: [] } as ILocalData;
+  public retrieveCache(serverId: any): ILocalData {
+    const localData = { id: serverId, groupedServerData: [] } as ILocalData;
     const collectionPath = `${this.fileLocation}/collections`;
     if (fs.existsSync(collectionPath)) {
       const fileNames = fs.readdirSync(collectionPath, 'utf-8');

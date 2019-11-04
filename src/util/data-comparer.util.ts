@@ -65,8 +65,8 @@ export function verifyIntegrity(payload: ISyncEventPayload) {
   return true;
 }
 
-export function hydrateData(localData: BehaviorSubject<ILocalData>, persistanceStrategy: IPersistanceStrategy) {
-  const cache = persistanceStrategy.retrieveCache();
+export function hydrateData(localData: BehaviorSubject<ILocalData>, persistanceStrategy: IPersistanceStrategy, serverId: any) {
+  const cache = persistanceStrategy.retrieveCache(serverId);
   localData.next(cache);
   return;
 }

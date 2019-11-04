@@ -37,7 +37,7 @@ export function setup(configuration: IConfig) {
   const id = config.serverId;
 
   const db = new BehaviorSubject<ILocalData>({ id, groupedServerData: [] });
-  hydrateData(db, config.persistenceStrategy);
+  hydrateData(db, config.persistenceStrategy, id);
 
   const wss = config.websocket;
   wss.addListener('connection', ws => {
