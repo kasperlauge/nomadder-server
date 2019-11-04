@@ -84,7 +84,8 @@ export function setup(configuration: IConfig) {
     // Continuesly announce changes to clients
     const numberOfClientsConnected = wss.clients.size;
     const redundancyFactor = config.redundancyFactor;
-    const batches = generateBatches(localData, redundancyFactor, numberOfClientsConnected);
+    const redundancyLimit = config.redundancyLimit;
+    const batches = generateBatches(localData, redundancyFactor, numberOfClientsConnected, redundancyLimit);
     console.log('Batches: ', JSON.stringify(batches));
     const batchEvents = generateBatchEvents(batches);
     console.log('clients: ', JSON.stringify(wss.clients));

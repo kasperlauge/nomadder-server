@@ -6,7 +6,12 @@ import { EventTypes, INomadderEvent, NOMADDER_PROTOCOL } from '../models/nomadde
 import { IServerDataPayload } from '../models/server-data-payload.model';
 import { IServerData } from '../models/server-data.model';
 
-export function generateBatches(db: ILocalData, redundancyFactor: number, clientsConnected: number): IServerData[] {
+export function generateBatches(
+  db: ILocalData, 
+  redundancyFactor: number, 
+  clientsConnected: number,
+  redundancyLimit: number
+  ): IServerData[] {
   const localData = db;
   const totalDataPoints = localData.groupedServerData
     .map(group => group.data.length)
@@ -21,7 +26,8 @@ export function generateBatches(db: ILocalData, redundancyFactor: number, client
   console.log('clients: ', clientsConnected);
   console.log("id: ", localData.id)
   const dataPoints = localData.groupedServerData.flatMap<IServerDataPayload>(group =>
-    group.data.map<IServerDataPayload>(item => ({
+    group.data.filter(d => d.uniqueServerIds.length < redundancyLimit)
+    .map<IServerDataPayload>(item => ({
       collectionName: group.collectionName,
       id: item.id,
       payload: item.data,
@@ -45,7 +51,7 @@ export function generateBatches(db: ILocalData, redundancyFactor: number, client
   for (let i = 0; i < clientsConnected; i++) {
     const numberOfElementsInBatch = Math.floor(redundantDatapoints.length / clientsConnected);
     const start = i * numberOfElementsInBatch;
-    const end = i * numberOfElementsInBatch + i * numberOfElementsInBatch;
+    const end = (i + 1) * numberOfElementsInBatch;
     const cut = redundantDatapoints.slice(start, end);
     const batch: IServerData = {
       data: cut,
