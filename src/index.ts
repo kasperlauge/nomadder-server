@@ -28,7 +28,7 @@ export function setup(configuration: IConfig) {
     config.redundancyFactor = 3;
   }
   if (!config.serverId) {
-    config.serverId = new Date().getTime(); // TODO: stupid way to generate an ID - It could be a hash of the MAC address maybe?
+    config.serverId = new Date().getTime();
   }
   if (!config.persistenceStrategy) {
     config.persistenceStrategy = new FilePersistanceStrategy({});
@@ -89,7 +89,7 @@ export function setup(configuration: IConfig) {
     const batchEvents = generateBatchEvents(batches);
     console.log('clients: ', JSON.stringify(wss.clients));
     let i = 0;
-    wss.clients.forEach(c => c.send(JSON.stringify(batchEvents[++i])));
+    wss.clients.forEach(c => c.send(JSON.stringify(batchEvents[i++])));
   });
 
   return true;
