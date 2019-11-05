@@ -95,9 +95,7 @@ export function setup(configuration: IConfig) {
     const redundancyFactor = config.redundancyFactor;
     const redundancyLimit = config.redundancyLimit;
     const batches = generateBatches(localData, redundancyFactor, numberOfClientsConnected, redundancyLimit);
-    console.log('Batches: ', JSON.stringify(batches));
     const batchEvents = generateBatchEvents(batches);
-    console.log('clients: ', JSON.stringify(wss.clients));
     let i = 0;
     wss.clients.forEach(c => c.send(JSON.stringify(batchEvents[i++])));
   });

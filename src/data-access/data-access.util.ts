@@ -18,13 +18,17 @@ export function getCollection(collectionName: string): Observable<IServerDataIte
 }
 
 export function upsertDataPoint(collectionName: string, id: any, data: any): Observable<boolean> {
+  // tslint:disable: no-console
+  console.log("Upsert called");
   const done = new Subject<boolean>();
   getDb().asObservable().pipe(take(1)).subscribe(db => {
     const collection = db.groupedServerData.find(gd => gd.collectionName === collectionName);
+    console.log("Collection found: ", collection);
     if (!collection) {
       done.next(false);
     } else {
       const index = collection.data.findIndex(d => d.id === id);
+      console.log("Index found: ", index);
       if (index === -1) {
         collection.data.push({
           data, 
