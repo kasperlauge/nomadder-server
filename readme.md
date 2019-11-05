@@ -168,3 +168,98 @@ Explanations for properties:
 11. string type - Name of one of the collections from the last server visited
 
 The client should react on the BATCH-event and persist the data almost as is. Then when connecting to a new server the client should send this data as a SYNC-event to that new server.
+
+### Scenario
+
+With two clients and one server the scenario would look something like this:
+
+```
++---------+                      +---------+                                      +---------+                                                  +-----------+
+| client1 |                      | client2 |                                      | server  |                                                  | database  |
++---------+                      +---------+                                      +---------+                                                  +-----------+
+     |                                |                                                |                                                             |
+     |                                |                                                | Start up                                                    |
+     |                                |                                                |---------                                                    |
+     |                                |                                                |        |                                                    |
+     |                                |                                                |<--------                                                    |
+     |                                |                                                |                                                             |
+     |                                |                                                | Fetch data from database                                    |
+     |                                |                                                |------------------------------------------------------------>|
+     |                                |                                                |                                                             |
+     |                                |                                                |                                                 Return data |
+     |                                |                                                |<------------------------------------------------------------|
+     |                                |                                                |                                                             |
+     |                                |                                                | Setup event listener for websocket connections              |
+     |                                |                                                |-----------------------------------------------              |
+     |                                |                                                |                                              |              |
+     |                                |                                                |<----------------------------------------------              |
+     |                                |                                                |                                                             |
+     | Connect websocket and send SYNC event                                           |                                                             |
+     |-------------------------------------------------------------------------------->|                                                             |
+     |                                |                                                |                                                             |
+     |                                |                                                | Check if any new collections in the data and add them       |
+     |                                |                                                |------------------------------------------------------       |
+     |                                |                                                |                                                     |       |
+     |                                |                                                |<-----------------------------------------------------       |
+     |                                |                                                |                                                             |
+     |                                |                                                | Upsert all data in database                                 |
+     |                                |                                                |------------------------------------------------------------>|
+     |                                |----------------------------------------------\ |                                                             |
+     |                                || If one data entry is already                |-|                                                             |
+     |                                || there with the same timestamp - store       | |                                                             |
+     |                                || which server has sent it in uniqueServerIds | |                                                             |
+     |                                ||---------------------------------------------| |                                   Database data has changed |
+     |                                |                                                |<------------------------------------------------------------|
+     |                                |                                                |                                                             |
+     |                                |                                                | Generate BATCH events for all clients connected             |
+     |                                |                                                |------------------------------------------------             |
+     |                                |                                                |                                               |             |
+     |                                |                                                |<-----------------------------------------------             |
+     |                                |                                                |                                                             |
+     |                                |                               Send BATCH event |                                                             |
+     |<--------------------------------------------------------------------------------|                                                             |
+     |                                |                                                |                                                             |
+     | Persist that data locally      |                                                |                                                             |
+     |--------------------------      |                                                |                                                             |
+     |                         |      |                                                |                                                             |
+     |<-------------------------      |                                                |                                                             |
+     |                                |                                                |                                                             |
+     |                                | Connect websocket and send SYNC event          |                                                             |
+     |                                |----------------------------------------------->|                                                             |
+     |                                |                                                |                                                             |
+     |                                |                                                | Check if any new collections in the data and add them       |
+     |                                |                                                |------------------------------------------------------       |
+     |                                |                                                |                                                     |       |
+     |                                |                                                |<-----------------------------------------------------       |
+     |                                |                                                |                                                             |
+     |                                |                                                | Upsert all data in database                                 |
+     |                                |                                                |------------------------------------------------------------>|
+     |                                |----------------------------------------------\ |                                                             |
+     |                                || If one data entry is already                |-|                                                             |
+     |                                || there with the same timestamp - store       | |                                                             |
+     |                                || which server has sent it in uniqueServerIds | |                                                             |
+     |                                ||---------------------------------------------| |                                   Database data has changed |
+     |                                |                                                |<------------------------------------------------------------|
+     |                                |                                                |                                                             |
+     |                                |                                                | Generate BATCH events for all clients connected             |
+     |                                |                                                |------------------------------------------------             |
+     |                                |                                                |                                               |             |
+     |                                |                                                |<-----------------------------------------------             |
+     |                                |                                                |                                                             |
+     |                                |                               Send BATCH event |                                                             |
+     |<--------------------------------------------------------------------------------|                                                             |
+     |                                |                                                |                                                             |
+     | Persist that data locally      |                                                |                                                             |
+     |--------------------------      |                                                |                                                             |
+     |                         |      |                                                |                                                             |
+     |<-------------------------      |                                                |                                                             |
+     |                                |                                                |                                                             |
+     |                                |                               Send BATCH event |                                                             |
+     |                                |<-----------------------------------------------|                                                             |
+     |                                |                                                |                                                             |
+     |                                | Persist that data locally                      |                                                             |
+     |                                |--------------------------                      |                                                             |
+     |                                |                         |                      |                                                             |
+     |                                |<-------------------------                      |                                                             |
+     |                                |                                                |                                                             |
+```
