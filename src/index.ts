@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { IConfig, IConfigParameters } from './models/config.model';
 import { FilePersistanceStrategy } from './models/file-persistance-strategy.model';
@@ -8,6 +8,8 @@ import { ISyncEventPayload } from './models/sync-event-payload.model';
 import { generateBatches, generateBatchEvents } from './util/batch-managing.util';
 import { extractNew, hydrateData } from './util/data-comparer.util';
 import { verifyIntegrity } from './util/general.util';
+
+let db: BehaviorSubject<ILocalData>;
 
 export function setup(configuration: IConfig) {
   const config = { ...configuration } as IConfigParameters;
@@ -37,7 +39,7 @@ export function setup(configuration: IConfig) {
 
   const id = config.serverId;
 
-  const db = new BehaviorSubject<ILocalData>({ id, groupedServerData: [] });
+  db = new BehaviorSubject<ILocalData>({ id, groupedServerData: [] });
   hydrateData(db, config.persistenceStrategy, id);
 
   const wss = config.websocket;
@@ -101,4 +103,8 @@ export function setup(configuration: IConfig) {
   });
 
   return true;
+}
+
+export function getDb(): BehaviorSubject<ILocalData> {
+  return db;
 }
