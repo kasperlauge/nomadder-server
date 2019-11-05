@@ -109,4 +109,7 @@ export function getDb(): BehaviorSubject<ILocalData> {
   return db;
 }
 
-export { getCollection } from './data-access/data-access.util';
+export { 
+  getCollection, 
+  upsertDataPoint 
+} from './data-access/data-access.util';
