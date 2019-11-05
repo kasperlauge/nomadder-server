@@ -41,5 +41,5 @@ export function upsertDataPoint(collectionName: string, id: any, data: any): Obs
       done.next(true);
     }
   });
-  return done;
+  return done.asObservable().pipe(take(1));
 }
