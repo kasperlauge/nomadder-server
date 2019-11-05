@@ -59,7 +59,11 @@ export function extractNew(data: IServerData, db: BehaviorSubject<ILocalData>): 
   return serverDataIndication.asObservable();
 }
 
-export function hydrateData(localData: BehaviorSubject<ILocalData>, persistanceStrategy: IPersistanceStrategy, serverId: any) {
+export function hydrateData(
+  localData: BehaviorSubject<ILocalData>,
+  persistanceStrategy: IPersistanceStrategy,
+  serverId: any,
+) {
   const cache = persistanceStrategy.retrieveCache(serverId);
   localData.next(cache);
   return;

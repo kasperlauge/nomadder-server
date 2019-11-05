@@ -7,11 +7,11 @@ import { IServerDataPayload } from '../models/server-data-payload.model';
 import { IServerData } from '../models/server-data.model';
 
 export function generateBatches(
-  db: ILocalData, 
-  redundancyFactor: number, 
+  db: ILocalData,
+  redundancyFactor: number,
   clientsConnected: number,
-  redundancyLimit: number
-  ): IServerData[] {
+  redundancyLimit: number,
+): IServerData[] {
   const localData = db;
   const totalDataPoints = localData.groupedServerData
     .map(group => group.data.length)
@@ -20,27 +20,21 @@ export function generateBatches(
   const actualNumberOfBatchPoints =
     numberOfBatchPoints / clientsConnected > totalDataPoints ? totalDataPoints * clientsConnected : numberOfBatchPoints;
   const duplicationFactor = Math.floor(actualNumberOfBatchPoints / totalDataPoints);
-  // tslint:disable: no-console
-  console.log("DuplicationFactor: ", duplicationFactor)
-  console.log('flat map ? ', localData.groupedServerData);
-  console.log('clients: ', clientsConnected);
-  console.log("id: ", localData.id)
   const dataPoints = localData.groupedServerData.flatMap<IServerDataPayload>(group =>
-    group.data.filter(d => d.uniqueServerIds.length < redundancyLimit)
-    .map<IServerDataPayload>(item => ({
-      collectionName: group.collectionName,
-      id: item.id,
-      payload: item.data,
-      timestamp: item.timestamp,
-    })),
+    group.data
+      .filter(d => d.uniqueServerIds.length < redundancyLimit)
+      .map<IServerDataPayload>(item => ({
+        collectionName: group.collectionName,
+        id: item.id,
+        payload: item.data,
+        timestamp: item.timestamp,
+      })),
   );
   // Duplicate datapoints based on redundancy factor
   let redundantDatapoints = [...dataPoints];
   for (let i = 0; i < duplicationFactor - 1; i++) {
     redundantDatapoints = [...redundantDatapoints, ...dataPoints];
   }
-
-  console.log("redundantData: ", redundantDatapoints);
 
   const collectionDefinitions = localData.groupedServerData.map<ICollectionDefinition>(group => ({
     name: group.collectionName,
@@ -74,7 +68,7 @@ export function generateBatchEvents(batches: IServerData[]): INomadderEvent[] {
         protocolInformation: {
           event: EventTypes.BATCH,
           payload: {
-            data: b
+            data: b,
           },
         },
       } as INomadderEvent),
