@@ -1,5 +1,5 @@
-import { Observable, Subject } from 'rxjs';
-import { map, take } from 'rxjs/operators';
+import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { map, take, filter } from 'rxjs/operators';
 import { getDb } from '..';
 import { IServerDataItem } from '../models/server-data-item.model';
 
@@ -20,7 +20,7 @@ export function getCollection(collectionName: string): Observable<IServerDataIte
 export function upsertDataPoint(collectionName: string, id: any, data: any): Observable<boolean> {
   // tslint:disable: no-console
   console.log("Upsert called");
-  const done = new Subject<boolean>();
+  const done = new BehaviorSubject<boolean | null>(null);
   getDb().asObservable().pipe(take(1)).subscribe(db => {
     const collection = db.groupedServerData.find(gd => gd.collectionName === collectionName);
     console.log("Collection found: ", collection);
@@ -45,5 +45,8 @@ export function upsertDataPoint(collectionName: string, id: any, data: any): Obs
       done.next(true);
     }
   });
-  return done.asObservable().pipe(take(1));
+  return done.asObservable()
+    .pipe(filter(d => d !== null))
+    .pipe(map(d => d as boolean))
+    .pipe(take(1));
 }
