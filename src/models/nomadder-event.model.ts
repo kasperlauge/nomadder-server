@@ -1,5 +1,4 @@
-import { IBatchEventPayload } from './batch-event-payload.model';
-import { ISyncEventPayload } from './sync-event-payload.model';
+import { IProtocolPayload } from './protocol-information.model';
 
 export enum EventTypes {
   SYNC = 'SYNC',
@@ -12,6 +11,6 @@ export const NOMADDER_PROTOCOL: ProtocolType = 'NOMADDER';
 
 export interface INomadderEvent {
   protocol: ProtocolType;
-  event: EventTypes;
-  payload: ISyncEventPayload | IBatchEventPayload;
+  protocolInformation: IProtocolPayload;
+  hash: string;
 }

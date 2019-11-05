@@ -6,7 +6,8 @@ import { ILocalData } from './models/local-data.model';
 import { EventTypes, INomadderEvent, NOMADDER_PROTOCOL } from './models/nomadder-event.model';
 import { ISyncEventPayload } from './models/sync-event-payload.model';
 import { generateBatches, generateBatchEvents } from './util/batch-managing.util';
-import { extractNew, hydrateData, verifyIntegrity } from './util/data-comparer.util';
+import { extractNew, hydrateData } from './util/data-comparer.util';
+import { verifyIntegrity } from './util/general.util';
 
 export function setup(configuration: IConfig) {
   const config = { ...configuration } as IConfigParameters;
@@ -60,19 +61,25 @@ export function setup(configuration: IConfig) {
         return;
       }
 
-      switch (msg.event) {
+      // Verify the integrity of the data sent
+      if (!verifyIntegrity(msg.protocolInformation, msg.hash)) {
+        return;
+      }
+      // Verify correct event format
+      if (!msg.protocolInformation.event) {
+        return;
+      }
+      switch (msg.protocolInformation.event) {
         case EventTypes.SYNC:
-          const payload = msg.payload as ISyncEventPayload;
-          if (verifyIntegrity(payload)) {
+          const payload = msg.protocolInformation.payload as ISyncEventPayload;
             extractNew(payload.data, db)
               .pipe(take(1))
               // tslint:disable-next-line: no-empty
               .subscribe(_ => {});
-          }
           break;
         default:
           /*tslint:disable-next-line:no-console*/
-          console.error('[Unknown event type]: ', msg.event);
+          console.error('[Unknown event type]: ', msg.protocolInformation.event);
           break;
       }
     });

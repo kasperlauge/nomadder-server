@@ -69,12 +69,14 @@ export function generateBatchEvents(batches: IServerData[]): INomadderEvent[] {
   return batches.map(
     b =>
       ({
-        event: EventTypes.BATCH,
-        payload: {
-          data: b,
-          hash: generateHash(b),
-        },
+        hash: generateHash(b),
         protocol: NOMADDER_PROTOCOL,
+        protocolInformation: {
+          event: EventTypes.BATCH,
+          payload: {
+            data: b
+          },
+        },
       } as INomadderEvent),
   );
 }

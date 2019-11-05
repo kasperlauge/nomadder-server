@@ -59,12 +59,6 @@ export function extractNew(data: IServerData, db: BehaviorSubject<ILocalData>): 
   return serverDataIndication.asObservable();
 }
 
-export function verifyIntegrity(payload: ISyncEventPayload) {
-  // This method should verify that the data has not been tampered with using the hash on
-  // the payload
-  return true;
-}
-
 export function hydrateData(localData: BehaviorSubject<ILocalData>, persistanceStrategy: IPersistanceStrategy, serverId: any) {
   const cache = persistanceStrategy.retrieveCache(serverId);
   localData.next(cache);
