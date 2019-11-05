@@ -44,11 +44,6 @@ export function setup(configuration: IConfig) {
 
   const wss = config.websocket;
   wss.addListener('connection', ws => {
-    // tslint:disable: no-console
-
-    // wss.clients.forEach(client => {
-    //   client.
-    // });
     ws.addListener('message', message => {
       // Parse message data
       let msg = null;
@@ -107,7 +102,4 @@ export function getDb(): BehaviorSubject<ILocalData> {
   return db;
 }
 
-export { 
-  getCollection, 
-  upsertDataPoint 
-} from './data-access/data-access.util';
+export { getCollection, upsertDataPoint } from './data-access/data-access.util';

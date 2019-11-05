@@ -1,58 +1,20 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { ICollectionDefinition } from '../models/collection-definition.model';
-import { IData } from '../models/data.model';
 import { IGroupedServerData } from '../models/grouped-server-data.model';
 import { ILocalData } from '../models/local-data.model';
 import { IPersistanceStrategy } from '../models/persistance-strategy.model';
-import { IServerDataIndication } from '../models/server-data-indication.model';
-import { IServerDataInfo } from '../models/server-data-info.model';
 import { IServerDataItem } from '../models/server-data-item.model';
 import { IServerData } from '../models/server-data.model';
-import { ISyncEventPayload } from '../models/sync-event-payload.model';
 
 // tslint:disable: no-console
 
 export function extractNew(data: IServerData, db: BehaviorSubject<ILocalData>): Observable<void> {
   const serverDataIndication = new Subject<void>();
   db.pipe(take(1)).subscribe(localData => {
-    // const serverDataInfos = localData.serverDataInfo;
     const serverData = data;
-    // tslint:disable-next-line: no-console
-    //   const redundancyIndex = 0;
-    //   const similarIndex = serverDataInfos.findIndex(s => s.serverId === serverData.serverId);
-    //   const similar = serverDataInfos[similarIndex];
-    //   // If we already have the data, and the timestamp is newer or the same then it isn't new data
-    //   if (similar) {
-    //     if (new Date(similar.timestamp) >= new Date(serverData.timestamp)) {
-    //       similar.redundancyIndex++;
-    //     } else {
-    //       const sd = { ...serverData, redundancyIndex } as IServerDataIndication;
-    //       similar.redundancyIndex = 0;
-    //       similar.timestamp = serverData.timestamp;
-    //       newServerData.push(sd);
-    //     }
-    //   } else {
-    //     const sd = { ...serverData, redundancyIndex } as IServerDataIndication;
-    //     newServerData.push(sd);
-    //   }
-    // const newInfo = newServerData
-    //   .filter(n => n.redundancyIndex === 0)
-    //   .map(n => ({
-    //     redundancyIndex: n.redundancyIndex,
-    //     serverId: n.serverId,
-    //     timestamp: n.timestamp,
-    //   })) as IServerDataInfo[];
-
-    // Remove potential duplicates which are both in newInfo and serverDataInfos
-    // const serverDataFlattened = serverDataInfos.filter(sdi => {
-    //   const isInNewInfo = newInfo.findIndex(ni => ni.serverId === sdi.serverId) !== -1;
-    //   return !isInNewInfo;
-    // });
     // Handle the data saved
     const localDb = saveNewData(localData, serverData, serverData.schemaDefinition);
-    // Append server data stored about other servers
-    // const localDbWithServerData = Object.assign({}, localDb, { serverDataInfo: [...serverDataFlattened, ...newInfo] });
     db.next(localDb);
     serverDataIndication.next();
   });
