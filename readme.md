@@ -50,7 +50,7 @@ export function getFruits(req: Request, res: Response, next: NextFunction) {
 export function postFruitData(req: Request, res: Response, next: NextFunction) {
   const id = req.body["id"];
   const data = req.body["data"];
-  upsertDataPoint("fruit", id, data).subscribe(_ => {
+  upsertDataPoint("fruits", id, data).subscribe(_ => {
     res.status(200).json({id, data});
   });
 }
