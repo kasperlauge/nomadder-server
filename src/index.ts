@@ -8,7 +8,6 @@ import { ISyncEventPayload } from './models/sync-event-payload.model';
 import { generateBatches, generateBatchEvents } from './util/batch-managing.util';
 import { extractNew, hydrateData } from './util/data-comparer.util';
 import { verifyIntegrity } from './util/general.util';
-import { getCollection } from './data-access/data-access.util';
 
 let db: BehaviorSubject<ILocalData>;
 
@@ -75,10 +74,10 @@ export function setup(configuration: IConfig) {
       switch (msg.protocolInformation.event) {
         case EventTypes.SYNC:
           const payload = msg.protocolInformation.payload as ISyncEventPayload;
-            extractNew(payload.data, db)
-              .pipe(take(1))
-              // tslint:disable-next-line: no-empty
-              .subscribe(_ => {});
+          extractNew(payload.data, db)
+            .pipe(take(1))
+            // tslint:disable-next-line: no-empty
+            .subscribe(_ => {});
           break;
         default:
           /*tslint:disable-next-line:no-console*/
