@@ -8,6 +8,7 @@ import { ISyncEventPayload } from './models/sync-event-payload.model';
 import { generateBatches, generateBatchEvents } from './util/batch-managing.util';
 import { extractNew, hydrateData } from './util/data-comparer.util';
 import { verifyIntegrity } from './util/general.util';
+import { getCollection } from './data-access/data-access.util';
 
 let db: BehaviorSubject<ILocalData>;
 
@@ -108,3 +109,5 @@ export function setup(configuration: IConfig) {
 export function getDb(): BehaviorSubject<ILocalData> {
   return db;
 }
+
+export { getCollection } from './data-access/data-access.util';
