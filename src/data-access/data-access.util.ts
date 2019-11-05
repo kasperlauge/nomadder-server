@@ -25,7 +25,17 @@ export function upsertDataPoint(collectionName: string, id: any, data: any): Obs
     const collection = db.groupedServerData.find(gd => gd.collectionName === collectionName);
     console.log("Collection found: ", collection);
     if (!collection) {
-      done.next(false);
+      db.groupedServerData.push({
+        collectionName,
+        data: [
+          {
+            data,
+            id,
+            timestamp: new Date().getTime(),
+            uniqueServerIds: []
+          }
+        ]
+      });
     } else {
       const index = collection.data.findIndex(d => d.id === id);
       console.log("Index found: ", index);
@@ -41,9 +51,9 @@ export function upsertDataPoint(collectionName: string, id: any, data: any): Obs
         collection.data[index].timestamp = new Date().getTime();
         collection.data[index].uniqueServerIds = [];
       }
-      getDb().next(db);
-      done.next(true);
     }
+    getDb().next(db);
+    done.next(true);
   });
   return done.asObservable()
     .pipe(filter(d => d !== null))
