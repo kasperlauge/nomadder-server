@@ -76,6 +76,6 @@ export function generateBatchEvents(batches: IServerData[], key: string): INomad
 
 export function generateHash(data: any, key: string) {
   const hmac = crypto.createHmac("sha256", key);
-  hmac.update(data);
+  hmac.update(JSON.stringify(data));
   return hmac.digest('hex');
 }
