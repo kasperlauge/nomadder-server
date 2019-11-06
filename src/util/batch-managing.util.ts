@@ -59,18 +59,20 @@ export function generateBatches(
 }
 
 export function generateBatchEvents(batches: IServerData[], key: string): INomadderEvent[] {
-  return batches.map(
-    b =>
-      ({
-        hash: generateHash(b, key),
-        protocol: NOMADDER_PROTOCOL,
-        protocolInformation: {
-          event: EventTypes.BATCH,
-          payload: {
-            data: b,
-          },
+  return batches.map(b => {
+      const pi = {
+        event: EventTypes.BATCH,
+        payload: {
+          data: b,
         },
-      } as INomadderEvent),
+      };
+
+      return {
+        hash: generateHash(pi, key),
+        protocol: NOMADDER_PROTOCOL,
+        protocolInformation: pi,
+      } as INomadderEvent;
+    }
   );
 }
 
