@@ -36,6 +36,9 @@ export function setup(configuration: IConfig) {
   if (!config.persistenceStrategy) {
     config.persistenceStrategy = new FilePersistanceStrategy({});
   }
+  if (!config.keySource) {
+    config.keySource = () => Promise.resolve("Not very secret");
+  }
 
   const id = config.serverId;
 
@@ -90,9 +93,11 @@ export function setup(configuration: IConfig) {
     const redundancyFactor = config.redundancyFactor;
     const redundancyLimit = config.redundancyLimit;
     const batches = generateBatches(localData, redundancyFactor, numberOfClientsConnected, redundancyLimit);
-    const batchEvents = generateBatchEvents(batches);
-    let i = 0;
-    wss.clients.forEach(c => c.send(JSON.stringify(batchEvents[i++])));
+    config.keySource().then(key => {
+      const batchEvents = generateBatchEvents(batches, key);
+      let i = 0;
+      wss.clients.forEach(c => c.send(JSON.stringify(batchEvents[i++])));
+    });
   });
 
   return true;

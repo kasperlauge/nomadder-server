@@ -3,6 +3,7 @@ import { IPersistanceStrategy } from './persistance-strategy.model';
 export interface IConfig {
   serverId?: any;
   websocket: Server;
+  keySource?: () => Promise<string>;
   fileLocation?: string;
   persistenceStrategy?: IPersistanceStrategy;
   redundancyLimit?: number;
@@ -12,6 +13,7 @@ export interface IConfig {
 export interface IConfigParameters {
   serverId: any;
   websocket: Server;
+  keySource: () => Promise<string>;
   fileLocation: string;
   persistenceStrategy: IPersistanceStrategy;
   redundancyLimit: number;

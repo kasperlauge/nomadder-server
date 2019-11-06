@@ -1,5 +1,4 @@
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { take } from 'rxjs/operators';
+import * as crypto from "crypto";
 import { ICollectionDefinition } from '../models/collection-definition.model';
 import { ILocalData } from '../models/local-data.model';
 import { EventTypes, INomadderEvent, NOMADDER_PROTOCOL } from '../models/nomadder-event.model';
@@ -59,11 +58,11 @@ export function generateBatches(
   return batches;
 }
 
-export function generateBatchEvents(batches: IServerData[]): INomadderEvent[] {
+export function generateBatchEvents(batches: IServerData[], key: string): INomadderEvent[] {
   return batches.map(
     b =>
       ({
-        hash: generateHash(b),
+        hash: generateHash(b, key),
         protocol: NOMADDER_PROTOCOL,
         protocolInformation: {
           event: EventTypes.BATCH,
@@ -75,7 +74,8 @@ export function generateBatchEvents(batches: IServerData[]): INomadderEvent[] {
   );
 }
 
-export function generateHash(data: any) {
-  // TODO: Implement
-  return '123';
+export function generateHash(data: any, key: string) {
+  const hmac = crypto.createHmac("sha256", key);
+  hmac.update(data);
+  return hmac.digest('hex');
 }
