@@ -18,8 +18,10 @@ export class FilePersistanceStrategy implements IPersistanceStrategy {
       db.groupedServerData.forEach(gds => {
         fs.writeFile(`${collectionLocation}/${gds.collectionName}.json`, JSON.stringify(gds.data), error => {
           // Do nothing
-          // tslint:disable-next-line: no-console
-          console.log('Error?:', error);
+          if (error) {
+            // tslint:disable-next-line: no-console
+            console.log('Error:', error);
+          }
         });
       });
     } else {
