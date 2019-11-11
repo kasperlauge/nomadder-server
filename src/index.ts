@@ -79,6 +79,10 @@ export function setup(configuration: IConfig) {
             // tslint:disable-next-line: no-empty
             .subscribe(_ => {});
           }
+          else{
+            const serverDataIndication = new Subject<void>();
+            serverDataIndication.next()
+          }
           break;
         default:
           /*tslint:disable-next-line:no-console*/
