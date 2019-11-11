@@ -60,7 +60,6 @@ export function setup(configuration: IConfig) {
       if (msg.protocol !== NOMADDER_PROTOCOL) {
         return;
       }
-
       // Verify the integrity of the data sent
       if (!verifyIntegrity(msg.protocolInformation, msg.hash)) {
         return;
@@ -72,16 +71,16 @@ export function setup(configuration: IConfig) {
       switch (msg.protocolInformation.event) {
         case EventTypes.SYNC:
           const payload = msg.protocolInformation.payload as ISyncEventPayload;
-          console.log("Here")
-          if(payload.data){ //check validity
+          if (payload.data) { //check validity
             extractNew(payload.data, db)
-            .pipe(take(1))
-            // tslint:disable-next-line: no-empty
-            .subscribe(_ => {});
+              .pipe(take(1))
+              // tslint:disable-next-line: no-empty
+              .subscribe(_ => { });
           }
-          else{
-            const serverDataIndication = new Subject<void>();
-            serverDataIndication.next()
+          else {
+            db.pipe(take(1)).subscribe(localData => {
+              db.next(localData)
+            });
           }
           break;
         default:
@@ -103,7 +102,6 @@ export function setup(configuration: IConfig) {
     config.keySource().then(key => {
       const batchEvents = generateBatchEvents(batches, key);
       let i = 0;
-      console.log("Writing to clients")
       wss.clients.forEach(c => c.send(JSON.stringify(batchEvents[i++])));
     });
   });
