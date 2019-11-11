@@ -72,6 +72,7 @@ export function setup(configuration: IConfig) {
       switch (msg.protocolInformation.event) {
         case EventTypes.SYNC:
           const payload = msg.protocolInformation.payload as ISyncEventPayload;
+          console.log("Here")
           if(payload.data){ //check validity
             extractNew(payload.data, db)
             .pipe(take(1))
