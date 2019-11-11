@@ -93,6 +93,8 @@ export function setup(configuration: IConfig) {
 
   // Continuesly cache data
   db.asObservable().subscribe((localData: ILocalData) => {
+    
+    console.log("sending client data")
     config.persistenceStrategy.persistData(localData);
     // Continuesly announce changes to clients
     const numberOfClientsConnected = wss.clients.size;
