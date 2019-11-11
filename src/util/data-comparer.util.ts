@@ -11,6 +11,8 @@ import { IServerData } from '../models/server-data.model';
 
 export function extractNew(data: IServerData, db: BehaviorSubject<ILocalData>): Observable<void> {
   const serverDataIndication = new Subject<void>();
+
+  console.log("")
   db.pipe(take(1)).subscribe(localData => {
     const serverData = data;
     // Handle the data saved

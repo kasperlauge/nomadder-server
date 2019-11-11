@@ -72,10 +72,12 @@ export function setup(configuration: IConfig) {
       switch (msg.protocolInformation.event) {
         case EventTypes.SYNC:
           const payload = msg.protocolInformation.payload as ISyncEventPayload;
-          extractNew(payload.data, db)
+          if(payload){
+            extractNew(payload.data, db)
             .pipe(take(1))
             // tslint:disable-next-line: no-empty
             .subscribe(_ => {});
+          }
           break;
         default:
           /*tslint:disable-next-line:no-console*/
@@ -96,6 +98,7 @@ export function setup(configuration: IConfig) {
     config.keySource().then(key => {
       const batchEvents = generateBatchEvents(batches, key);
       let i = 0;
+      console.log("Writing to clients")
       wss.clients.forEach(c => c.send(JSON.stringify(batchEvents[i++])));
     });
   });
