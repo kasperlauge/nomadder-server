@@ -72,7 +72,7 @@ export function setup(configuration: IConfig) {
       switch (msg.protocolInformation.event) {
         case EventTypes.SYNC:
           const payload = msg.protocolInformation.payload as ISyncEventPayload;
-          if(payload){
+          if(payload.data){ //check validity
             extractNew(payload.data, db)
             .pipe(take(1))
             // tslint:disable-next-line: no-empty
