@@ -2,12 +2,18 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { IConfig, IConfigParameters } from './models/config.model';
 import { FilePersistanceStrategy } from './models/file-persistance-strategy.model';
+import { IIdentityEventPayload } from './models/identity-event-payload.model';
 import { ILocalData } from './models/local-data.model';
 import { EventTypes, INomadderEvent, NOMADDER_PROTOCOL } from './models/nomadder-event.model';
+import { IServerDataItem } from './models/server-data-item.model';
 import { ISyncEventPayload } from './models/sync-event-payload.model';
 import { generateBatches, generateBatchEvents } from './util/batch-managing.util';
 import { extractNew, hydrateData } from './util/data-comparer.util';
 import { verifyIntegrity } from './util/general.util';
+import { 
+  generateIdentityEvent,
+  getCollectionItem, 
+} from './util/identity.util';
 
 let db: BehaviorSubject<ILocalData>;
 
@@ -69,13 +75,24 @@ export function setup(configuration: IConfig) {
       if (!msg.protocolInformation.event) {
         return;
       }
+      let payload: any = null;
       switch (msg.protocolInformation.event) {
         case EventTypes.SYNC:
-          const payload = msg.protocolInformation.payload as ISyncEventPayload;
+          payload = msg.protocolInformation.payload as ISyncEventPayload;
           extractNew(payload.data, db)
             .pipe(take(1))
             // tslint:disable-next-line: no-empty
             .subscribe(_ => {});
+          break;
+        case EventTypes.IDENTITY:
+          payload = msg.protocolInformation.payload as IIdentityEventPayload;
+          getCollectionItem(payload.id, payload.collection)
+          .pipe(take(1))
+          .subscribe(item => {
+            config.keySource().then(key => {
+              ws.send(JSON.stringify(generateIdentityEvent(item as IServerDataItem, key, config.serverId, payload.collection)));
+            });
+          });
           break;
         default:
           /*tslint:disable-next-line:no-console*/
