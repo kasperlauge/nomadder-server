@@ -2,13 +2,21 @@ import { BehaviorSubject, Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { IConfig, IConfigParameters } from './models/config.model';
 import { FilePersistanceStrategy } from './models/file-persistance-strategy.model';
+import { IIdentityEventPayload } from './models/identity-event-payload.model';
+import { IIdentitySyncEventPayload } from './models/identity-sync-event-payload.model';
 import { ILocalData } from './models/local-data.model';
 import { EventTypes, INomadderEvent, NOMADDER_PROTOCOL } from './models/nomadder-event.model';
+import { IServerDataItem } from './models/server-data-item.model';
 import { ISyncEventPayload } from './models/sync-event-payload.model';
 import { generateBatches, generateBatchEvents } from './util/batch-managing.util';
-import { extractNew, hydrateData } from './util/data-comparer.util';
+import { extractNew, hydrateData, upsertIdentityItem } from './util/data-comparer.util';
 import { verifyIntegrity } from './util/general.util';
+import { 
+  generateIdentityEvent,
+  getCollectionItem, 
+} from './util/identity.util';
 
+// tslint:disable: no-console
 let db: BehaviorSubject<ILocalData>;
 
 export function setup(configuration: IConfig) {
@@ -65,17 +73,41 @@ export function setup(configuration: IConfig) {
       if (!verifyIntegrity(msg.protocolInformation, msg.hash)) {
         return;
       }
+      console.log("Got event: ", msg);
       // Verify correct event format
       if (!msg.protocolInformation.event) {
         return;
       }
+      let payload: any = null;
       switch (msg.protocolInformation.event) {
         case EventTypes.SYNC:
-          const payload = msg.protocolInformation.payload as ISyncEventPayload;
+          payload = msg.protocolInformation.payload as ISyncEventPayload;
           extractNew(payload.data, db)
             .pipe(take(1))
             // tslint:disable-next-line: no-empty
             .subscribe(_ => {});
+          break;
+        case EventTypes.IDENTITY:
+          console.log("Registered Identity event");
+          payload = msg.protocolInformation.payload as IIdentityEventPayload;
+          getCollectionItem(payload.id, payload.collection)
+          .pipe(take(1))
+          .subscribe(item => {
+            config.keySource().then(key => {
+              console.log("Got key");
+              const event = generateIdentityEvent(item as IServerDataItem, key, config.serverId, payload.collection);
+              console.log("Created event: ", event);
+              ws.send(JSON.stringify(event));
+            });
+          });
+          break;
+        case EventTypes.IDENTITYSYNC:
+          console.log("Registered Identity sync event");
+          const syncPayload = msg.protocolInformation.payload as IIdentitySyncEventPayload;
+          upsertIdentityItem(db, syncPayload.data.data[0], syncPayload.data.serverId)
+          .pipe(take(1))
+          // tslint:disable-next-line: no-empty
+          .subscribe(_ => {});
           break;
         default:
           /*tslint:disable-next-line:no-console*/

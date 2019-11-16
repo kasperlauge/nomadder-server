@@ -3,6 +3,8 @@ import { IProtocolPayload } from './protocol-information.model';
 export enum EventTypes {
   SYNC = 'SYNC',
   BATCH = 'BATCH',
+  IDENTITY = 'IDENTITY',
+  IDENTITYSYNC = 'IDENTITYSYNC'
 }
 
 export type ProtocolType = 'NOMADDER';

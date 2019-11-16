@@ -5,6 +5,7 @@ import { IGroupedServerData } from '../models/grouped-server-data.model';
 import { ILocalData } from '../models/local-data.model';
 import { IPersistanceStrategy } from '../models/persistance-strategy.model';
 import { IServerDataItem } from '../models/server-data-item.model';
+import { IServerDataPayload } from '../models/server-data-payload.model';
 import { IServerData } from '../models/server-data.model';
 
 // tslint:disable: no-console
@@ -111,4 +112,53 @@ export function upsertSingleItem(serverDataItem: IServerDataItem, dataGroup: IGr
   } else {
     dataGroup.data.push(serverDataItem);
   }
+}
+
+export function upsertIdentityItem(db: BehaviorSubject<ILocalData>, item: IServerDataPayload, serverId: any): Observable<void> {
+  const done = new Subject<void>();
+  db.pipe(take(1)).subscribe(localData => {
+    const colId = localData.groupedServerData.findIndex(gds => gds.collectionName === item.collectionName);
+    if (colId !== -1) {
+      const dataGroup = localData.groupedServerData[colId];
+      const itemId = dataGroup.data.findIndex(d => d.id === item.id);
+      if (itemId !== -1) {
+        const groupItem = dataGroup.data[itemId];
+        if (new Date(groupItem.timestamp) > new Date(item.timestamp)) {
+          return;
+        } 
+        if (new Date(groupItem.timestamp) === new Date(item.timestamp)) {
+          const sId = groupItem.uniqueServerIds.findIndex(u => u === serverId);
+          if (sId === -1) {
+            groupItem.uniqueServerIds.push(serverId);
+          }
+        } else {
+          groupItem.data = item.payload;
+          groupItem.timestamp = item.timestamp;
+          groupItem.uniqueServerIds = [];
+        }
+      } else {
+        dataGroup.data.push({
+          data: item.payload,
+          id: item.id,
+          timestamp: new Date().getTime(),
+          uniqueServerIds: []
+        });
+      }
+    } else {
+      localData.groupedServerData.push({
+        collectionName: item.collectionName,
+        data: [
+          {
+            data: item.payload,
+            id: item.id,
+            timestamp: new Date().getTime(),
+            uniqueServerIds: []
+          }
+        ]
+      })
+    }
+    db.next(localData);
+    done.next();
+  });
+  return done;
 }
