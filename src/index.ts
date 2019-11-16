@@ -15,6 +15,7 @@ import {
   getCollectionItem, 
 } from './util/identity.util';
 
+// tslint:disable: no-console
 let db: BehaviorSubject<ILocalData>;
 
 export function setup(configuration: IConfig) {
@@ -85,12 +86,16 @@ export function setup(configuration: IConfig) {
             .subscribe(_ => {});
           break;
         case EventTypes.IDENTITY:
+          console.log("Registered Identity event");
           payload = msg.protocolInformation.payload as IIdentityEventPayload;
           getCollectionItem(payload.id, payload.collection)
           .pipe(take(1))
           .subscribe(item => {
             config.keySource().then(key => {
-              ws.send(JSON.stringify(generateIdentityEvent(item as IServerDataItem, key, config.serverId, payload.collection)));
+              console.log("Got key");
+              const event = generateIdentityEvent(item as IServerDataItem, key, config.serverId, payload.collection);
+              console.log("Created event: ", event);
+              ws.send(JSON.stringify(event));
             });
           });
           break;
