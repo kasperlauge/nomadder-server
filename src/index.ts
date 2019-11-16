@@ -72,6 +72,7 @@ export function setup(configuration: IConfig) {
       if (!verifyIntegrity(msg.protocolInformation, msg.hash)) {
         return;
       }
+      console.log("Got event: ", msg);
       // Verify correct event format
       if (!msg.protocolInformation.event) {
         return;
